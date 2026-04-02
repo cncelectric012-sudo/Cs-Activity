@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#1a1a1a">
-<title>CS Admin Portal V41 — 27 Mar 2026</title>
+<title>CS Admin Portal V41 Enhanced — Import & Password Management</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -408,13 +408,182 @@ input,select,textarea,button{font-family:var(--font)}
 /* ── Page transition ── */
 .pg{animation:pgIn .2s ease}
 @keyframes pgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+/* Import Modal Styles */
+.import-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:10000;display:none;align-items:center;justify-content:center;padding:20px}
+.import-overlay.on{display:flex}
+.import-modal{background:var(--W);border-radius:var(--rx);max-width:500px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.im-hd{background:var(--G1);color:var(--W);padding:20px;border-radius:var(--rx) var(--rx) 0 0;display:flex;align-items:center;justify-content:space-between}
+.im-title{font-size:18px;font-weight:800;display:flex;align-items:center;gap:8px}
+.im-close{width:32px;height:32px;border-radius:50%;background:var(--G3);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px;font-weight:800;color:var(--G6);transition:.2s}
+.im-close:hover{background:var(--R);color:var(--W)}
+.im-body{padding:24px}
+.im-section{margin-bottom:20px}
+.im-label{font-size:12px;font-weight:700;color:var(--G5);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.im-drop{border:3px dashed var(--G8);border-radius:var(--rl);padding:40px 20px;text-align:center;cursor:pointer;transition:.2s;background:var(--G9)}
+.im-drop:hover,.im-drop.drag-over{border-color:var(--R);background:var(--Rbg)}
+.im-drop-icon{font-size:48px;margin-bottom:12px}
+.im-drop-text{font-size:14px;font-weight:700;color:var(--G3);margin-bottom:4px}
+.im-drop-sub{font-size:11px;color:var(--G5)}
+.im-file-info{background:var(--grn-bg);border:2px solid var(--grn);border-radius:var(--r);padding:12px;display:flex;align-items:center;gap:10px;margin-top:12px}
+.im-file-icon{font-size:24px}
+.im-file-details{flex:1;min-width:0}
+.im-file-name{font-size:13px;font-weight:700;color:var(--grn);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.im-file-size{font-size:10px;color:#166534;margin-top:2px}
+.im-remove{font-size:20px;cursor:pointer;color:var(--R);font-weight:800}
+.im-progress{margin-top:20px;display:none}
+.im-progress.on{display:block}
+.im-prog-bar{height:8px;background:var(--G8);border-radius:4px;overflow:hidden;margin-bottom:8px}
+.im-prog-fill{height:100%;background:linear-gradient(90deg,var(--R),var(--Rm));transition:width .3s;border-radius:4px}
+.im-prog-text{font-size:12px;font-weight:600;color:var(--G5);text-align:center}
+.im-summary{background:var(--blu-bg);border:2px solid var(--blu);border-radius:var(--rl);padding:16px;margin-top:20px;display:none}
+.im-summary.on{display:block}
+.im-sum-title{font-size:14px;font-weight:800;color:var(--blu);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.im-sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.im-sum-item{background:var(--W);border-radius:8px;padding:10px;text-align:center}
+.im-sum-num{font-size:20px;font-weight:800;color:var(--blu)}
+.im-sum-label{font-size:10px;font-weight:700;color:var(--G5);text-transform:uppercase;margin-top:2px}
+.im-errors{background:var(--Rbg);border:2px solid var(--R);border-radius:var(--rl);padding:14px;margin-top:12px;display:none}
+.im-errors.on{display:block}
+.im-err-title{font-size:13px;font-weight:800;color:var(--R);margin-bottom:8px}
+.im-err-item{font-size:11px;color:#7f1d1d;margin-bottom:4px;padding-left:12px;position:relative}
+.im-err-item:before{content:'•';position:absolute;left:0}
+.im-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px}
+.im-opt{border:2px solid var(--G8);border-radius:var(--r);padding:12px;cursor:pointer;transition:.2s;background:var(--W)}
+.im-opt:hover{border-color:var(--R)}
+.im-opt.on{border-color:var(--R);background:var(--Rbg)}
+.im-opt-label{font-size:12px;font-weight:700;color:var(--G3);display:flex;align-items:center;gap:6px}
+.im-opt-label input{margin:0}
+.im-opt-desc{font-size:10px;color:var(--G5);margin-top:4px}
+.import-btn-wrap{display:flex;gap:8px}
+.import-btn{flex:1;padding:14px;border-radius:var(--r);font-size:14px;font-weight:800;cursor:pointer;border:none;transition:.15s}
+.import-btn:disabled{opacity:.5;cursor:not-allowed}
+.import-btn-primary{background:var(--R);color:var(--W)}
+.import-btn-primary:active:not(:disabled){transform:scale(.97)}
+.import-btn-secondary{background:var(--G8);color:var(--G3)}
+.tb-import{background:var(--R);color:var(--W);padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;border:2px solid var(--R);transition:.15s}
+.tb-import:active{transform:scale(.95)}
+.tb-import-icon{font-size:16px}
 </style>
 </head>
 <body>
 <div id="toasts"></div><div id="offline-bar">⚠️ Offline</div>
+
+<!-- Password Change Modal -->
+<div class="modal-overlay" id="pw-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--W);border-radius:var(--rx);max-width:500px;width:100%;max-height:90vh;overflow-y:auto">
+    <div style="background:var(--G1);color:var(--W);padding:16px 20px;border-radius:var(--rx) var(--rx) 0 0;display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:16px;font-weight:800">🔐 Change Password</div>
+      <div style="width:28px;height:28px;border-radius:50%;background:var(--G3);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;font-weight:800;color:var(--G6)" onclick="App.closePwModal()">×</div>
+    </div>
+    <div style="padding:20px">
+      <div class="fg">
+        <label class="fl">Current Password</label>
+        <input type="password" class="fi" id="pw-current" placeholder="Enter current password">
+      </div>
+      <div class="fg">
+        <label class="fl">New Password</label>
+        <input type="password" class="fi" id="pw-new" placeholder="Enter new password">
+      </div>
+      <div class="fg">
+        <label class="fl">Confirm New Password</label>
+        <input type="password" class="fi" id="pw-confirm" placeholder="Confirm new password">
+      </div>
+      <button class="btn btn-R" onclick="App.changePassword()">Update Password</button>
+    </div>
+  </div>
+</div>
+
+<!-- User Password Reset Modal -->
+<div class="modal-overlay" id="user-pw-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--W);border-radius:var(--rx);max-width:500px;width:100%;max-height:90vh;overflow-y:auto">
+    <div style="background:var(--G1);color:var(--W);padding:16px 20px;border-radius:var(--rx) var(--rx) 0 0;display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:16px;font-weight:800">🔑 Reset User Password</div>
+      <div style="width:28px;height:28px;border-radius:50%;background:var(--G3);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;font-weight:800;color:var(--G6)" onclick="App.closeUserPwModal()">×</div>
+    </div>
+    <div style="padding:20px">
+      <div style="background:var(--blu-bg);border:2px solid var(--blu);border-radius:var(--r);padding:12px;margin-bottom:16px">
+        <div style="font-size:13px;font-weight:700;color:var(--blu);margin-bottom:4px" id="upw-user-name">User Name</div>
+        <div style="font-size:11px;color:#1e3a5f" id="upw-user-un">@username</div>
+      </div>
+      <div class="fg">
+        <label class="fl">New Password</label>
+        <input type="password" class="fi" id="upw-new" placeholder="Enter new password">
+      </div>
+      <div class="fg">
+        <label class="fl">Confirm Password</label>
+        <input type="password" class="fi" id="upw-confirm" placeholder="Confirm new password">
+      </div>
+      <button class="btn btn-R" onclick="App.changeUserPassword()">Reset Password</button>
+    </div>
+  </div>
+</div>
+
+<!-- Import Modal -->
+<div class="import-overlay" id="import-overlay">
+  <div class="import-modal">
+    <div class="im-hd">
+      <div class="im-title"><span>📥</span><span>Import Data</span></div>
+      <div class="im-close" onclick="ImportManager.close()">×</div>
+    </div>
+    <div class="im-body">
+      <div class="im-section">
+        <div class="im-label">Select File to Import</div>
+        <div class="im-drop" id="im-drop">
+          <div class="im-drop-icon">📁</div>
+          <div class="im-drop-text">Drop HTML file here or click to browse</div>
+          <div class="im-drop-sub">Supports CS Activity Reporter files (.html)</div>
+        </div>
+        <input type="file" id="im-file-input" accept=".html" style="display:none">
+        <div id="im-file-info" style="display:none"></div>
+      </div>
+      <div class="im-section">
+        <div class="im-label">Import Options</div>
+        <div class="im-opts">
+          <div class="im-opt on" data-opt="attendance">
+            <div class="im-opt-label"><input type="checkbox" checked> 📅 Attendance</div>
+            <div class="im-opt-desc">Import attendance records</div>
+          </div>
+          <div class="im-opt on" data-opt="reports">
+            <div class="im-opt-label"><input type="checkbox" checked> 📝 Reports</div>
+            <div class="im-opt-desc">Import activity & visit reports</div>
+          </div>
+          <div class="im-opt on" data-opt="meetings">
+            <div class="im-opt-label"><input type="checkbox" checked> 🤝 Meetings</div>
+            <div class="im-opt-desc">Import meeting records</div>
+          </div>
+          <div class="im-opt on" data-opt="leaves">
+            <div class="im-opt-label"><input type="checkbox" checked> 🏖️ Leaves</div>
+            <div class="im-opt-desc">Import leave applications</div>
+          </div>
+        </div>
+      </div>
+      <div class="im-progress" id="im-progress">
+        <div class="im-prog-bar"><div class="im-prog-fill" id="im-prog-fill" style="width:0%"></div></div>
+        <div class="im-prog-text" id="im-prog-text">Preparing...</div>
+      </div>
+      <div class="im-summary" id="im-summary">
+        <div class="im-sum-title"><span>✅</span><span>Import Summary</span></div>
+        <div class="im-sum-grid">
+          <div class="im-sum-item"><div class="im-sum-num" id="sum-att">0</div><div class="im-sum-label">Attendance</div></div>
+          <div class="im-sum-item"><div class="im-sum-num" id="sum-rpt">0</div><div class="im-sum-label">Reports</div></div>
+          <div class="im-sum-item"><div class="im-sum-num" id="sum-meet">0</div><div class="im-sum-label">Meetings</div></div>
+          <div class="im-sum-item"><div class="im-sum-num" id="sum-leave">0</div><div class="im-sum-label">Leaves</div></div>
+        </div>
+      </div>
+      <div class="im-errors" id="im-errors">
+        <div class="im-err-title">⚠️ Import Warnings</div>
+        <div id="im-err-list"></div>
+      </div>
+      <div class="import-btn-wrap">
+        <button class="import-btn import-btn-secondary" onclick="ImportManager.close()">Cancel</button>
+        <button class="import-btn import-btn-primary" id="im-import-btn" onclick="ImportManager.startImport()" disabled>Import Data</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="load-ov" id="load-ov"><div class="load-box"><div class="load-spin"></div><div class="load-msg" id="load-msg">Loading...</div><div class="load-sub" id="load-sub"></div></div></div>
 <div id="s-login" class="scr" style="display:none"></div>
-<div id="s-admin" class="scr"><div class="topbar"><div class="tb-l"><div class="tb-b">CS <em>Admin Portal</em></div><span style="font-size:9px;font-weight:700;padding:3px 10px;border-radius:16px;background:var(--R);color:var(--W)">V41</span><span style="font-size:8px;color:var(--G5);margin-left:4px">27Mar2026</span></div><div class="tb-r"><span style="font-size:12px;color:var(--G5)" id="a-nm"></span><button class="tb-out" onclick="App.logout()">Out</button></div></div><div class="ct" style="padding-bottom:66px"><div id="ap-dash" class="pg on">
+<div id="s-admin" class="scr"><div class="topbar"><div class="tb-l"><div class="tb-b">CS <em>Admin Portal</em></div><span style="font-size:9px;font-weight:700;padding:3px 10px;border-radius:16px;background:var(--R);color:var(--W)">V41</span><span style="font-size:8px;color:var(--G5);margin-left:4px">27Mar2026</span></div><div class="tb-r"><div class="tb-import" onclick="ImportManager.open()" style="margin-right:6px"><span style="font-size:16px">📥</span><span>Import</span></div><div class="tb-help" onclick="App.openPwModal()" title="Change Password" style="margin-right:6px">🔑</div><span style="font-size:12px;color:var(--G5)" id="a-nm"></span><button class="tb-out" onclick="App.logout()">Out</button></div></div><div class="ct" style="padding-bottom:66px"><div id="ap-dash" class="pg on">
 <!-- Welcome Header -->
 <div style="background:var(--G1);border-radius:var(--rl);padding:16px;margin-bottom:12px;border:2px solid var(--G3);box-shadow:var(--sh3d)">
 <div style="display:flex;align-items:center;justify-content:space-between">
@@ -4078,6 +4247,448 @@ App.loadAdmLeave=async function(){
 };
 
 U.esc=function(s){if(!s)return'';var d=document.createElement('div');d.textContent=s;return d.innerHTML};
+
+
+// ═══════════════════════════════════════════════════════════════
+// IMPORT MANAGER - Data Import from Previous Files
+// ═══════════════════════════════════════════════════════════════
+var ImportManager={
+  selectedFile:null,
+  extractedData:null,
+  options:{attendance:true,reports:true,meetings:true,leaves:true},
+  
+  init:function(){
+    var dropZone=document.getElementById('im-drop');
+    var fileInput=document.getElementById('im-file-input');
+    if(!dropZone||!fileInput)return;
+    
+    dropZone.addEventListener('click',function(){fileInput.click()});
+    fileInput.addEventListener('change',function(e){
+      if(e.target.files.length>0)ImportManager.handleFile(e.target.files[0]);
+    });
+    
+    dropZone.addEventListener('dragover',function(e){
+      e.preventDefault();
+      dropZone.classList.add('drag-over');
+    });
+    
+    dropZone.addEventListener('dragleave',function(){
+      dropZone.classList.remove('drag-over');
+    });
+    
+    dropZone.addEventListener('drop',function(e){
+      e.preventDefault();
+      dropZone.classList.remove('drag-over');
+      if(e.dataTransfer.files.length>0)ImportManager.handleFile(e.dataTransfer.files[0]);
+    });
+    
+    document.querySelectorAll('.im-opt').forEach(function(opt){
+      opt.addEventListener('click',function(){
+        var checkbox=opt.querySelector('input');
+        checkbox.checked=!checkbox.checked;
+        opt.classList.toggle('on',checkbox.checked);
+        var optName=opt.dataset.opt;
+        ImportManager.options[optName]=checkbox.checked;
+      });
+    });
+  },
+  
+  open:function(){
+    document.getElementById('import-overlay').classList.add('on');
+    this.reset();
+  },
+  
+  close:function(){
+    document.getElementById('import-overlay').classList.remove('on');
+  },
+  
+  reset:function(){
+    this.selectedFile=null;
+    this.extractedData=null;
+    document.getElementById('im-file-info').style.display='none';
+    document.getElementById('im-drop').style.display='block';
+    document.getElementById('im-progress').classList.remove('on');
+    document.getElementById('im-summary').classList.remove('on');
+    document.getElementById('im-errors').classList.remove('on');
+    document.getElementById('im-import-btn').disabled=true;
+    document.getElementById('im-file-input').value='';
+  },
+  
+  handleFile:function(file){
+    if(!file.name.endsWith('.html')){
+      U.toast('Please select an HTML file','err');
+      return;
+    }
+    
+    ImportManager.selectedFile=file;
+    
+    document.getElementById('im-drop').style.display='none';
+    var infoEl=document.getElementById('im-file-info');
+    infoEl.style.display='block';
+    infoEl.innerHTML='<div class="im-file-info"><div class="im-file-icon">📄</div><div class="im-file-details"><div class="im-file-name">'+U.esc(file.name)+'</div><div class="im-file-size">'+(file.size/1024).toFixed(1)+' KB</div></div><div class="im-remove" onclick="ImportManager.reset()">×</div></div>';
+    
+    document.getElementById('im-import-btn').disabled=false;
+    this.extractData(file);
+  },
+  
+  extractData:function(file){
+    var reader=new FileReader();
+    reader.onload=function(e){
+      try{
+        var text=e.target.result;
+        var data={attendance:{},reports:{},meetings:{},leaves:{},users:{}};
+        
+        var dataMatch=text.match(/window\._DATA\s*=\s*({[\s\S]*?});/);
+        if(dataMatch){
+          try{
+            var extractedData=eval('('+dataMatch[1]+')');
+            Object.assign(data,extractedData);
+          }catch(err){console.error('Failed to parse _DATA:',err)}
+        }
+        
+        var localStorageMatch=text.match(/localStorage\.setItem\(['"]cs_data['"]\s*,\s*JSON\.stringify\(([\s\S]*?)\)\)/);
+        if(localStorageMatch){
+          try{
+            var extractedData=eval('('+localStorageMatch[1]+')');
+            Object.assign(data,extractedData);
+          }catch(err){console.error('Failed to parse localStorage:',err)}
+        }
+        
+        var scriptMatches=text.matchAll(/<script>([\s\S]*?)<\/script>/g);
+        for(var match of scriptMatches){
+          var scriptContent=match[1];
+          var objMatches=scriptContent.matchAll(/(?:var|let|const)\s+(\w+)\s*=\s*({[\s\S]*?});/g);
+          for(var objMatch of objMatches){
+            var varName=objMatch[1];
+            if(['attendance','reports','meetings','leaves','users','_att','_rpts','_meets','_leaves','_users'].includes(varName)){
+              try{
+                var obj=eval('('+objMatch[2]+')');
+                if(varName.startsWith('_')){
+                  var cleanName=varName.substring(1);
+                  if(cleanName==='att')data.attendance=obj;
+                  else if(cleanName==='rpts')data.reports=obj;
+                  else if(cleanName==='meets')data.meetings=obj;
+                  else data[cleanName]=obj;
+                }else{
+                  data[varName]=obj;
+                }
+              }catch(err){console.error('Failed to parse '+varName+':',err)}
+            }
+          }
+        }
+        
+        ImportManager.extractedData=data;
+        ImportManager.showPreview(data);
+      }catch(err){
+        console.error('Extract error:',err);
+        U.toast('Failed to read file','err');
+      }
+    };
+    reader.readAsText(file);
+  },
+  
+  showPreview:function(data){
+    var counts={
+      attendance:Object.keys(data.attendance||{}).length,
+      reports:Object.keys(data.reports||{}).length,
+      meetings:Object.keys(data.meetings||{}).length,
+      leaves:Object.keys(data.leaves||{}).length
+    };
+    
+    document.getElementById('sum-att').textContent=counts.attendance;
+    document.getElementById('sum-rpt').textContent=counts.reports;
+    document.getElementById('sum-meet').textContent=counts.meetings;
+    document.getElementById('sum-leave').textContent=counts.leaves;
+    
+    if(counts.attendance+counts.reports+counts.meetings+counts.leaves===0){
+      document.getElementById('im-errors').classList.add('on');
+      document.getElementById('im-err-list').innerHTML='<div class="im-err-item">No data found in the selected file</div>';
+      document.getElementById('im-import-btn').disabled=true;
+    }else{
+      document.getElementById('im-summary').classList.add('on');
+    }
+  },
+  
+  startImport:async function(){
+    if(!ImportManager.extractedData){
+      U.toast('No data to import','err');
+      return;
+    }
+    
+    document.getElementById('im-import-btn').disabled=true;
+    document.getElementById('im-progress').classList.add('on');
+    
+    var data=ImportManager.extractedData;
+    var options=ImportManager.options;
+    var imported={attendance:0,reports:0,meetings:0,leaves:0};
+    var warnings=[];
+    
+    try{
+      if(options.attendance&&data.attendance){
+        document.getElementById('im-prog-text').textContent='Importing attendance...';
+        document.getElementById('im-prog-fill').style.width='25%';
+        await new Promise(function(r){setTimeout(r,300)});
+        
+        for(var userId in data.attendance){
+          for(var date in data.attendance[userId]){
+            var existing=await F.g('attendance/'+userId+'/'+date);
+            if(existing){
+              warnings.push('Skipped duplicate attendance: '+userId+' on '+date);
+            }else{
+              await F.s('attendance/'+userId+'/'+date,data.attendance[userId][date]);
+              imported.attendance++;
+            }
+          }
+        }
+      }
+      
+      if(options.reports&&data.reports){
+        document.getElementById('im-prog-text').textContent='Importing reports...';
+        document.getElementById('im-prog-fill').style.width='50%';
+        await new Promise(function(r){setTimeout(r,300)});
+        
+        for(var id in data.reports){
+          var existing=await F.g('reports/'+id);
+          if(existing){
+            warnings.push('Skipped duplicate report: '+id);
+          }else{
+            await F.s('reports/'+id,data.reports[id]);
+            imported.reports++;
+          }
+        }
+      }
+      
+      if(options.meetings&&data.meetings){
+        document.getElementById('im-prog-text').textContent='Importing meetings...';
+        document.getElementById('im-prog-fill').style.width='75%';
+        await new Promise(function(r){setTimeout(r,300)});
+        
+        for(var id in data.meetings){
+          var existing=await F.g('meetings/'+id);
+          if(existing){
+            warnings.push('Skipped duplicate meeting: '+id);
+          }else{
+            await F.s('meetings/'+id,data.meetings[id]);
+            imported.meetings++;
+          }
+        }
+      }
+      
+      if(options.leaves&&data.leaves){
+        document.getElementById('im-prog-text').textContent='Importing leaves...';
+        document.getElementById('im-prog-fill').style.width='90%';
+        await new Promise(function(r){setTimeout(r,300)});
+        
+        for(var id in data.leaves){
+          var existing=await F.g('leaves/'+id);
+          if(existing){
+            warnings.push('Skipped duplicate leave: '+id);
+          }else{
+            await F.s('leaves/'+id,data.leaves[id]);
+            imported.leaves++;
+          }
+        }
+      }
+      
+      document.getElementById('im-prog-text').textContent='Import complete!';
+      document.getElementById('im-prog-fill').style.width='100%';
+      
+      document.getElementById('sum-att').textContent=imported.attendance;
+      document.getElementById('sum-rpt').textContent=imported.reports;
+      document.getElementById('sum-meet').textContent=imported.meetings;
+      document.getElementById('sum-leave').textContent=imported.leaves;
+      
+      if(warnings.length>0&&warnings.length<=10){
+        document.getElementById('im-errors').classList.add('on');
+        document.getElementById('im-err-title').textContent='⚠️ Import Warnings ('+warnings.length+')';
+        document.getElementById('im-err-list').innerHTML=warnings.slice(0,10).map(function(w){return'<div class="im-err-item">'+U.esc(w)+'</div>'}).join('');
+      }else if(warnings.length>10){
+        document.getElementById('im-errors').classList.add('on');
+        document.getElementById('im-err-title').textContent='⚠️ Import Warnings ('+warnings.length+')';
+        document.getElementById('im-err-list').innerHTML='<div class="im-err-item">'+warnings.length+' duplicate items were skipped</div>';
+      }
+      
+      var total=imported.attendance+imported.reports+imported.meetings+imported.leaves;
+      U.toast('Successfully imported '+total+' items!','ok');
+      
+      setTimeout(function(){
+        if(typeof App.loadDash==='function')App.loadDash();
+        ImportManager.close();
+      },2000);
+      
+    }catch(err){
+      console.error('Import error:',err);
+      U.toast('Import failed: '+err.message,'err');
+      document.getElementById('im-import-btn').disabled=false;
+    }
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════
+// PASSWORD MANAGEMENT FUNCTIONS
+// ═══════════════════════════════════════════════════════════════
+App.openPwModal=function(){
+  var modal=document.getElementById('pw-modal');
+  if(modal){
+    modal.style.display='flex';
+    document.getElementById('pw-current').value='';
+    document.getElementById('pw-new').value='';
+    document.getElementById('pw-confirm').value='';
+  }
+};
+
+App.closePwModal=function(){
+  var modal=document.getElementById('pw-modal');
+  if(modal)modal.style.display='none';
+};
+
+App.changePassword=async function(){
+  var current=document.getElementById('pw-current').value;
+  var newPw=document.getElementById('pw-new').value;
+  var confirm=document.getElementById('pw-confirm').value;
+  
+  if(!current||!newPw||!confirm){
+    U.toast('Please fill all fields','warn');
+    return;
+  }
+  
+  if(newPw.length<6){
+    U.toast('Password must be at least 6 characters','warn');
+    return;
+  }
+  
+  if(newPw!==confirm){
+    U.toast('Passwords do not match','err');
+    return;
+  }
+  
+  try{
+    var user=await F.g('users/'+ME.id);
+    if(!user){
+      U.toast('User not found','err');
+      return;
+    }
+    
+    if(user.password!==current){
+      U.toast('Current password is incorrect','err');
+      return;
+    }
+    
+    user.password=newPw;
+    user.passwordChangedAt=new Date().toISOString();
+    await F.s('users/'+ME.id,user);
+    
+    ME.password=newPw;
+    this.save();
+    
+    U.toast('Password changed successfully!','ok');
+    this.closePwModal();
+  }catch(err){
+    console.error('Password change error:',err);
+    U.toast('Failed to change password','err');
+  }
+};
+
+App.openUserPwModal=function(userId){
+  F.g('users/'+userId).then(function(user){
+    if(!user){
+      U.toast('User not found','err');
+      return;
+    }
+    
+    App._selectedUserId=userId;
+    document.getElementById('upw-user-name').textContent=user.name;
+    document.getElementById('upw-user-un').textContent='@'+user.username;
+    document.getElementById('upw-new').value='';
+    document.getElementById('upw-confirm').value='';
+    var modal=document.getElementById('user-pw-modal');
+    if(modal)modal.style.display='flex';
+  });
+};
+
+App.closeUserPwModal=function(){
+  var modal=document.getElementById('user-pw-modal');
+  if(modal)modal.style.display='none';
+  App._selectedUserId=null;
+};
+
+App.changeUserPassword=async function(){
+  var newPw=document.getElementById('upw-new').value;
+  var confirm=document.getElementById('upw-confirm').value;
+  
+  if(!newPw||!confirm){
+    U.toast('Please fill all fields','warn');
+    return;
+  }
+  
+  if(newPw.length<6){
+    U.toast('Password must be at least 6 characters','warn');
+    return;
+  }
+  
+  if(newPw!==confirm){
+    U.toast('Passwords do not match','err');
+    return;
+  }
+  
+  if(!App._selectedUserId){
+    U.toast('No user selected','err');
+    return;
+  }
+  
+  try{
+    var user=await F.g('users/'+App._selectedUserId);
+    if(user){
+      user.password=newPw;
+      user.passwordResetBy=ME.id;
+      user.passwordResetAt=new Date().toISOString();
+      await F.s('users/'+App._selectedUserId,user);
+      
+      U.toast('Password reset successfully!','ok');
+      App.closeUserPwModal();
+    }else{
+      U.toast('User not found','err');
+    }
+  }catch(err){
+    console.error('Password reset error:',err);
+    U.toast('Failed to reset password','err');
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════
+// DEFAULT ADMIN CREATION
+// ═══════════════════════════════════════════════════════════════
+App.createDefaultAdmin=async function(){
+  try{
+    var users=await F.g('users')||{};
+    if(Object.keys(users).length===0){
+      var adminId='admin_default';
+      await F.s('users/'+adminId,{
+        name:'System Admin',
+        username:'admin',
+        password:'admin123',
+        role:'admin',
+        approved:true,
+        blocked:false,
+        createdAt:new Date().toISOString()
+      });
+      console.log('✅ Default admin created - username: admin, password: admin123');
+    }
+  }catch(err){
+    console.error('Failed to create default admin:',err);
+  }
+};
+
+// Initialize Import Manager on page load
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',function(){
+    ImportManager.init();
+    App.createDefaultAdmin();
+  });
+}else{
+  ImportManager.init();
+  App.createDefaultAdmin();
+}
 
 </script>
 </body>
