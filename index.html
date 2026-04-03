@@ -42,6 +42,7 @@
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <style>
+html,body{height:100%;overflow:hidden;margin:0;padding:0}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{--R:#b91c1c;--Rm:#dc2626;--Rl:#fecaca;--Rbg:#fef2f2;--G1:#1a1a1a;--G2:#2d2d2d;--G3:#404040;--G4:#666;--G5:#888;--G6:#aaa;--G7:#ccc;--G8:#e5e5e5;--G9:#f2f2f2;--W:#fff;--grn:#16a34a;--grn-bg:#dcfce7;--amb:#d97706;--amb-bg:#fffbeb;--blu:#2563eb;--blu-bg:#eff6ff;--font:'Plus Jakarta Sans',system-ui,sans-serif;--r:12px;--rl:16px;--rx:20px;--sh:0 2px 6px rgba(0,0,0,.08);--sh3d:0 3px 0 var(--G8),0 4px 10px rgba(0,0,0,.08);--safe-b:env(safe-area-inset-bottom,0px)}
 html,body{height:100%;font-family:var(--font);background:var(--G9);color:var(--G1);-webkit-font-smoothing:antialiased}
@@ -50,7 +51,7 @@ input,select,textarea,button{font-family:var(--font)}
 .toast{padding:13px 16px;border-radius:var(--r);font-size:14px;font-weight:600;text-align:center;animation:tIn .2s;pointer-events:auto;border:1px solid}
 .t-ok{background:#f0fdf4;color:#166534;border-color:#86efac}.t-err{background:#fef2f2;color:#991b1b;border-color:#fca5a5}.t-warn{background:#fffbeb;color:#92400e;border-color:#fcd34d}.t-info{background:#f0f4ff;color:#1e3a5f;border-color:#93c5fd}
 @keyframes tIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
-.scr{display:none;min-height:100dvh;flex-direction:column}.scr.on{display:flex}
+.scr{display:none;height:100dvh;flex-direction:column;overflow:hidden}.scr.on{display:flex}
 #s-login{background:var(--G1);align-items:center;justify-content:center;padding:24px;min-height:100dvh}
 .lw{width:100%;max-width:400px}.lh{text-align:center;margin-bottom:30px;color:var(--W)}
 .lh-icon{width:60px;height:60px;border-radius:50%;border:3px solid var(--R);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:26px}
@@ -71,7 +72,7 @@ input,select,textarea,button{font-family:var(--font)}
 .btn-R{background:var(--R);color:var(--W);border-color:var(--R);box-shadow:0 3px 0 #7f1d1d}.btn-R:active{box-shadow:0 1px 0 #7f1d1d;transform:translateY(2px)}
 .btn-ghost{background:var(--W);border:2px solid var(--G8);color:var(--G3);box-shadow:0 2px 0 var(--G8)}.btn-ghost:active{box-shadow:none;transform:translateY(2px)}
 .btn-sm{padding:7px 12px;font-size:11px;width:auto;border-radius:8px}
-.topbar{background:var(--G1);color:var(--W);padding:0 16px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;border-bottom:2px solid var(--R)}
+.topbar{background:var(--G1);color:var(--W);padding:0 16px;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:100;border-bottom:2px solid var(--R)}
 .tb-l{display:flex;align-items:center;gap:8px}.tb-b{font-size:16px;font-weight:800}.tb-b em{color:var(--R);font-style:normal}
 .tb-att{font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;cursor:pointer;display:flex;align-items:center;gap:4px;border:2px solid}
 .tb-ap{border-color:var(--amb);color:var(--amb);animation:pls 2s infinite}.tb-ad{border-color:var(--grn);color:var(--grn)}
@@ -84,13 +85,13 @@ input,select,textarea,button{font-family:var(--font)}
 .tki{padding:0 24px;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:5px;flex-shrink:0}
 .tk-u{color:#f87171}.tk-i{color:#fbbf24}.tk-r{color:#93c5fd}.tk-g{color:#4ade80}
 @keyframes tksc{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-.bnav{position:fixed;bottom:0;left:0;right:0;background:var(--W);border-top:2px solid var(--G8);display:flex;z-index:99;padding-bottom:var(--safe-b);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.bnav{background:var(--W);border-bottom:3px solid var(--R);display:flex;flex-shrink:0;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;box-shadow:0 2px 6px rgba(0,0,0,.08);padding:2px 4px}
 .bnav::-webkit-scrollbar{display:none}
-.bn{min-width:60px;flex:0 0 auto;display:flex;flex-direction:column;align-items:center;padding:8px 6px 6px;cursor:pointer;position:relative}
+.bn{min-width:58px;flex:1;display:flex;flex-direction:column;align-items:center;padding:6px 4px 5px;cursor:pointer;position:relative;border-radius:8px;margin:3px 2px;transition:background .15s}
 .bn-i{font-size:20px;margin-bottom:2px}.bn-l{font-size:9px;font-weight:700;color:var(--G5);text-transform:uppercase}
-.bn.on .bn-l{color:var(--R)}.bn.on::after{content:'';position:absolute;top:-2px;left:15%;right:15%;height:3px;background:var(--R)}
+.bn.on{background:var(--R)}.bn.on .bn-l{color:#fff;font-weight:900}.bn.on .bn-i{filter:brightness(0) invert(1)}
 .bn-dot{position:absolute;top:3px;right:calc(50% - 14px);width:7px;height:7px;border-radius:50%;background:var(--R);display:none}
-.ct{flex:1;padding:16px 16px calc(62px + var(--safe-b));max-width:600px;width:100%;margin:0 auto}
+.ct{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 10px 20px;max-width:700px;width:100%;margin:0 auto;overscroll-behavior:contain}
 .pg{display:none}.pg.on{display:block}
 .welc{display:flex;align-items:center;gap:14px;margin-bottom:16px}
 .w-av{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:var(--W);flex-shrink:0;border:3px solid var(--R)}
@@ -106,7 +107,7 @@ input,select,textarea,button{font-family:var(--font)}
 .card{background:var(--W);border-radius:var(--rl);border:2px solid var(--G8);padding:18px;margin-bottom:12px;box-shadow:var(--sh3d)}
 .card-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
 .card-t{font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px}
-.pg-hd{position:sticky;top:56px;z-index:50;background:var(--G9);padding:10px 0;display:flex;align-items:center;gap:8px;border-bottom:2px solid var(--G8);margin-bottom:14px}
+.pg-hd{position:sticky;top:0;z-index:50;background:var(--G9);padding:10px 0;display:flex;align-items:center;gap:8px;border-bottom:2px solid var(--G8);margin-bottom:14px}
 .pg-hd-t{font-size:16px;font-weight:800;flex:1}
 .vc{background:var(--W);border-radius:var(--rl);border:2px solid var(--G8);border-left:5px solid var(--R);padding:14px;margin-bottom:10px;box-shadow:var(--sh3d)}
 .vc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
@@ -178,7 +179,7 @@ input,select,textarea,button{font-family:var(--font)}
 .stat-n{font-size:24px;font-weight:800}.stat-l{font-size:9px;font-weight:700;color:var(--G5);margin-top:3px;text-transform:uppercase}
 .sec{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--G5);margin:16px 0 8px;display:flex;align-items:center;gap:6px}.sec::after{content:'';flex:1;height:1px;background:var(--G7)}
 .help-item{border:2px solid var(--G8);border-radius:var(--r);margin-bottom:6px;overflow:hidden}.help-q{padding:14px;font-size:13px;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;background:var(--W)}.help-a{padding:0 14px;max-height:0;overflow:hidden;transition:max-height .3s,padding .3s;font-size:12px;color:var(--G4);line-height:1.6}.help-item.open .help-a{max-height:400px;padding:10px 14px 14px}
-.ai-fab{position:fixed;bottom:calc(62px + var(--safe-b) + 10px);right:14px;width:46px;height:46px;border-radius:50%;background:var(--G1);color:var(--R);border:2px solid var(--R);font-size:20px;cursor:pointer;box-shadow:0 8px 28px rgba(0,0,0,.16);z-index:98;display:flex;align-items:center;justify-content:center}
+.ai-fab{position:fixed;bottom:20px;right:14px;width:46px;height:46px;border-radius:50%;background:var(--G1);color:var(--R);border:2px solid var(--R);font-size:20px;cursor:pointer;box-shadow:0 8px 28px rgba(0,0,0,.16);z-index:98;display:flex;align-items:center;justify-content:center}
 .ai-panel{position:fixed;bottom:0;left:0;right:0;height:0;background:var(--W);border-top:2px solid var(--R);border-radius:20px 20px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.2);z-index:200;transition:height .3s;overflow:hidden;display:flex;flex-direction:column}.ai-panel.on{height:70vh}
 .ai-hd{padding:12px 16px;border-bottom:2px solid var(--G8);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}.ai-hd-t{font-size:15px;font-weight:800}
 .ai-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
@@ -276,11 +277,11 @@ input,select,textarea,button{font-family:var(--font)}
 #cal-popup .cp-title{font-size:14px;font-weight:800;color:var(--G2);margin-bottom:8px}
 #cal-popup .cp-row{display:flex;justify-content:space-between;padding:4px 0;font-size:12px;border-bottom:1px solid #fef3c7}.cp-row:last-child{border:none}
 #cal-popup .cp-label{color:var(--G5);font-weight:600}.cp-val{font-weight:700;color:var(--G2)}
-#ep-cal{overflow-anchor:none}.cal-filters{scroll-margin-top:0;position:sticky;top:56px;z-index:10;background:var(--G9);padding:8px 0}
+#ep-cal{overflow-anchor:none}.cal-filters{scroll-margin-top:0;position:sticky;top:0;z-index:10;background:var(--G9);padding:8px 0}
 @media(max-width:380px){.mst{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:1fr 1fr}}
 
 /* ── ADMIN DASHBOARD STYLES ── */
-.adm-filter{background:var(--W);border:2px solid var(--G8);border-radius:10px;padding:12px;margin-bottom:10px}
+.adm-filter{background:var(--W);border:2px solid var(--G8);border-radius:10px;padding:12px;margin-bottom:10px;margin-top:0}
 .adm-filter h4{font-size:11px;font-weight:700;color:var(--G5);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
 .adm-frow{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
 .adm-frow:last-child{margin-bottom:0}
@@ -292,7 +293,7 @@ input,select,textarea,button{font-family:var(--font)}
 .adm-chip{padding:5px 10px;border:2px solid var(--G8);border-radius:16px;font-size:11px;font-weight:600;color:var(--G5);background:var(--W);cursor:pointer}
 .adm-chip.on{background:var(--R);color:var(--W);border-color:var(--R)}
 .att-sub{display:none}.att-sub.on{display:block}
-.adm-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+.adm-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:10px}
 .adm-stat{background:var(--W);border:2px solid var(--G8);border-radius:8px;padding:10px 6px;text-align:center}
 .adm-stat .sv{font-size:22px;font-weight:800;color:var(--R)}
 .adm-stat .sl{font-size:9px;font-weight:700;color:var(--G5);text-transform:uppercase;letter-spacing:.3px;margin-top:2px}
@@ -646,7 +647,8 @@ input,select,textarea,button{font-family:var(--font)}
   <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--G5)">Employees → use the Employee Portal</div>
 </div>
 </div>
-<div id="s-admin" class="scr"><div class="topbar"><div class="tb-l"><div class="tb-b" style="font-size:22px;font-weight:900;letter-spacing:-0.5px;line-height:1">Cognitive <em style="font-style:normal;color:var(--R)">Solutions</em></div></div><div class="tb-r" style="position:relative"><div class="tb-help" onclick="App.openPwModal()" title="Change Password" style="margin-right:6px">🔑</div><span style="font-size:12px;color:var(--G5)" id="a-nm"></span><button class="tb-out" onclick="App.logout()">Out</button></div></div><div class="ct" style="padding-bottom:66px"><div id="ap-dash" class="pg on">
+<div id="s-admin" class="scr"><div class="topbar"><div class="tb-l"><div class="tb-b" style="font-size:22px;font-weight:900;letter-spacing:-0.5px;line-height:1">Cognitive <em style="font-style:normal;color:var(--R)">Solutions</em></div></div><div class="tb-r" style="position:relative"><div class="tb-help" onclick="App.openPwModal()" title="Change Password" style="margin-right:6px">🔑</div><span style="font-size:12px;color:var(--G5)" id="a-nm"></span><button class="tb-out" onclick="App.logout()">Out</button></div></div><div class="bnav"><div class="bn on" onclick="App.anav('dash')"><div class="bn-i">🏠</div><div class="bn-l">Home</div></div><div class="bn" onclick="App.anav('att')"><div class="bn-i">✅</div><div class="bn-l">Attendance</div></div><div class="bn" style="position:relative" onclick="App.anav('rpts')"><div class="bn-i">📝</div><div class="bn-l">Activity</div><span id="notif-badge" style="display:none;position:absolute;top:4px;right:8px;background:var(--R);color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:10px;min-width:16px;text-align:center;border:2px solid var(--W)">0</span></div><div class="bn" onclick="App.anav('vis')"><div class="bn-i">📍</div><div class="bn-l">Visits</div></div><div class="bn" onclick="App.anav('plan')"><div class="bn-i">📋</div><div class="bn-l">Plan</div></div><div class="bn" onclick="App.anav('cal')"><div class="bn-i">📅</div><div class="bn-l">Calendar</div></div><div class="bn" onclick="App.anav('sum')"><div class="bn-i">📊</div><div class="bn-l">Summary</div></div><div class="bn" onclick="App.anav('instr')"><div class="bn-i">📢</div><div class="bn-l">Announce</div></div><div class="bn" onclick="App.anav('appr')"><div class="bn-i">📑</div><div class="bn-l">Report/AI</div></div><div class="bn" onclick="App.anav('staff')"><div class="bn-i">👥</div><div class="bn-l">Staff</div></div></div>
+<div class="ct"><div id="ap-dash" class="pg on">
 <!-- Welcome Header -->
 <div style="background:var(--G1);border-radius:var(--rl);padding:16px;margin-bottom:12px;border:2px solid var(--G3);box-shadow:var(--sh3d)">
 <div style="display:flex;align-items:center;justify-content:space-between">
@@ -741,7 +743,7 @@ input,select,textarea,button{font-family:var(--font)}
 <div class="adm-frow"><div class="adm-fg"><span class="adm-fl">Employee</span><select class="adm-fi" id="aa-emp" onchange="App.loadAdmAtt()"></select></div></div>
 <div class="adm-frow"><div class="adm-fg"><span class="adm-fl">From</span><input type="date" class="adm-fi" id="aa-from" onchange="App.loadAdmAtt()"></div><div class="adm-fg"><span class="adm-fl">To</span><input type="date" class="adm-fi" id="aa-to" onchange="App.loadAdmAtt()"></div></div>
 <div class="adm-chips" id="aa-chips"><button class="adm-chip on" onclick="App.aqsel('aa','today',this)">Today</button><button class="adm-chip" onclick="App.aqsel('aa','week',this)">This Week</button><button class="adm-chip" onclick="App.aqsel('aa','month',this)">This Month</button><button class="adm-chip" onclick="App.aqsel('aa','lastmonth',this)">Last Month</button></div></div>
-<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-bottom:10px">
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px">
 <div class="stat" style="border-top:3px solid var(--grn)"><div class="stat-n" style="color:var(--grn)" id="aa-pres">-</div><div class="stat-l">On Time</div></div>
 <div class="stat" style="border-top:3px solid var(--amb)"><div class="stat-n" style="color:var(--amb)" id="aa-late">-</div><div class="stat-l">Late</div></div>
 <div class="stat" style="border-top:3px solid var(--R)"><div class="stat-n" style="color:var(--R)" id="aa-abs">-</div><div class="stat-l">Absent</div></div>
@@ -971,7 +973,8 @@ input,select,textarea,button{font-family:var(--font)}
 </div>
 
 </div>
-<div id="ap-instr" class="pg"><div class="card"><div class="card-hd"><div class="card-t">📢 Send Instruction</div></div><div class="fg"><label class="fl">To</label><select class="fi fi-sel" id="ins-to"><option value="all">All</option></select></div><div class="fg"><label class="fl">Message <span class="wc" id="ins-body-wc">0/2000</span></label><textarea class="fi fi-ta" id="ins-body" oninput="App.wordCheck(this,'ins-body-wc')"></textarea></div><div class="fg"><label class="fl">Priority</label><select class="fi fi-sel" id="ins-pri"><option value="routine">🔵 Routine</option><option value="important">🟡 Important</option><option value="urgent">🔴 Urgent</option><option value="good">🟢 Good News</option></select></div><button class="btn btn-R" onclick="App.sendIns()">📨 Send</button></div><div class="sec">Sent</div><div id="a-ilog"></div></div></div><div class="bnav"><div class="bn on" onclick="App.anav('dash')"><div class="bn-i">🏠</div><div class="bn-l">Home</div></div><div class="bn" onclick="App.anav('att')"><div class="bn-i">✅</div><div class="bn-l">Attendance</div></div><div class="bn" style="position:relative" onclick="App.anav('rpts')"><div class="bn-i">📝</div><div class="bn-l">Activity</div><span id="notif-badge" style="display:none;position:absolute;top:4px;right:8px;background:var(--R);color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:10px;min-width:16px;text-align:center;border:2px solid var(--W)">0</span></div><div class="bn" onclick="App.anav('vis')"><div class="bn-i">📍</div><div class="bn-l">Visits</div></div><div class="bn" onclick="App.anav('plan')"><div class="bn-i">📋</div><div class="bn-l">Plan</div></div><div class="bn" onclick="App.anav('cal')"><div class="bn-i">📅</div><div class="bn-l">Calendar</div></div><div class="bn" onclick="App.anav('sum')"><div class="bn-i">📊</div><div class="bn-l">Summary</div></div><div class="bn" onclick="App.anav('instr')"><div class="bn-i">📢</div><div class="bn-l">Announce</div></div><div class="bn" onclick="App.anav('appr')"><div class="bn-i">📑</div><div class="bn-l">Report/AI</div></div><div class="bn" onclick="App.anav('staff')"><div class="bn-i">👥</div><div class="bn-l">Staff</div></div></div></div>
+<div id="ap-instr" class="pg"><div class="card"><div class="card-hd"><div class="card-t">📢 Send Instruction</div></div><div class="fg"><label class="fl">To</label><select class="fi fi-sel" id="ins-to"><option value="all">All</option></select></div><div class="fg"><label class="fl">Message <span class="wc" id="ins-body-wc">0/2000</span></label><textarea class="fi fi-ta" id="ins-body" oninput="App.wordCheck(this,'ins-body-wc')"></textarea></div><div class="fg"><label class="fl">Priority</label><select class="fi fi-sel" id="ins-pri"><option value="routine">🔵 Routine</option><option value="important">🟡 Important</option><option value="urgent">🔴 Urgent</option><option value="good">🟢 Good News</option></select></div><button class="btn btn-R" onclick="App.sendIns()">📨 Send</button></div><div class="sec">Sent</div><div id="a-ilog"></div></div></div>
+</div>
 <div id="map-ov"><div class="map-sh"><div class="map-hd"><div id="map-nm" style="font-weight:700;font-size:14px">Location</div><button class="btn btn-ghost btn-sm" onclick="App.closeMap()">✕</button></div><div id="leaflet-map"></div><a id="map-gl" href="#" target="_blank" class="map-lk">📍 Google Maps →</a></div></div>
 <div id="photo-ov" onclick="this.classList.remove('on')"><img id="pv-img" src=""></div>
 <div id="help-ov" onclick="if(event.target===this)this.classList.remove('on')"><div class="help-sh"><div class="help-title">📖 Help <button class="btn btn-ghost btn-sm" onclick="document.getElementById('help-ov').classList.remove('on')">✕</button></div><div id="help-content"></div></div></div>
@@ -1139,7 +1142,7 @@ if(p==='plan')App.loadAdmPlans();
 if(p==='cal')App.initAdmCalDd();
 if(p==='sum')App.initAdmSumDd();
 if(p==='appr'){App.initAdmApprDd();App.loadAIConfig()}
-document.querySelectorAll('#s-admin .bn').forEach(function(b){b.classList.remove('on')});var m={dash:0,att:1,rpts:2,vis:3,plan:4,cal:5,sum:6,instr:7,appr:8,staff:9};if(document.querySelectorAll('#s-admin .bn')[m[p]])document.querySelectorAll('#s-admin .bn')[m[p]].classList.add('on');
+document.querySelectorAll('#s-admin .bn').forEach(function(b){b.classList.remove('on')});var m={dash:0,att:1,rpts:2,vis:3,plan:4,cal:5,sum:6,instr:7,appr:8,staff:9};if(document.querySelectorAll('#s-admin .bn')[m[p]])document.querySelectorAll('#s-admin .bn')[m[p]].classList.add('on');/* Scroll content area to top on tab switch */var ctEl=document.querySelector('#s-admin .ct');if(ctEl)ctEl.scrollTop=0;
 if(p==='dash')this.loadDash();if(p==='staff')this.loadStaff();if(p==='rpts'){this._ar=[];this.aR();this.popFil()}if(p==='instr'){this.popIns();this.loadILog()}},
 checkAtt:async function(){try{var atts=_att.length?_att:F.arr(await F.g('attendance'));
 var todayAll=atts.filter(function(a){return a.userId===ME.id&&a.date===U.today()});
@@ -2010,7 +2013,7 @@ App.aqsel=function(prefix,period,btn){
   if(prefix==='aa')App.loadAdmAtt();else if(prefix==='av')App.loadAdmVis();else if(prefix==='apl')App.loadAdmPlans();else App.loadAdmRpts();
 };
 
-App.loadAdmPlans=async function(){
+App.loadAdmPlans=async function(){try{var ctEl=document.querySelector('#s-admin .ct');if(ctEl)ctEl.scrollTop=0}catch(e){};
   var emp=document.getElementById('apl-emp').value;
   var from=document.getElementById('apl-from').value,to=document.getElementById('apl-to').value;
   if(!from||!to)return;
@@ -3619,7 +3622,7 @@ App.dlAdmVisPdf=function(){if(!_admVisRows.length){alert('No data');return}
 /* ═══ ADMIN CALENDAR TAB (V6) ═══ */
 var _acY,_acM,_acRpts=[],_acAtt=[],_acPlans=[],_acFil='all',_acDlOpen=false;
 
-App.initAdmCalDd=async function(){
+App.initAdmCalDd=async function(){try{var ctEl=document.querySelector('#s-admin .ct');if(ctEl)ctEl.scrollTop=0}catch(e){};
   try{var users=F.arr(await F.g('users')).filter(function(u){return u.approved===true&&u.blocked!==true});
   var sel=document.getElementById('ac-emp');var cur=sel.value;
   sel.innerHTML='<option value="">— Select Employee —</option>';
@@ -3763,7 +3766,7 @@ App.admRenderDayLog=function(){
 /* ═══ ADMIN SUMMARY TAB (V6) ═══ */
 var _asSumData=null,_asSumPeriod='week';
 
-App.initAdmSumDd=async function(){
+App.initAdmSumDd=async function(){try{var ctEl=document.querySelector('#s-admin .ct');if(ctEl)ctEl.scrollTop=0}catch(e){};
   try{var users=F.arr(await F.g('users')).filter(function(u){return u.approved===true&&u.blocked!==true});
   var sel=document.getElementById('as-emp');var cur=sel.value;
   sel.innerHTML='<option value="">— Select Employee —</option>';
