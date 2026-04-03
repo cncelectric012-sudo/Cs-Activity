@@ -10,6 +10,36 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Cognitive Solutions">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#111111">
+<link id="pwa-manifest-link" rel="manifest">
+<script>
+/* Inline PWA Manifest via Blob URL */
+(function(){
+  var manifest={
+    name:"Cognitive Solutions",
+    short_name:"CS Admin",
+    description:"Admin portal for Cognitive Solutions",
+    start_url:window.location.href,
+    display:"standalone",
+    background_color:"#111111",
+    theme_color:"#111111",
+    orientation:"portrait",
+    icons:[
+      {src:"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%23111'/><text y='.9em' font-size='80' x='10'>🛡️</text></svg>",sizes:"192x192",type:"image/svg+xml"},
+      {src:"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%23111'/><text y='.9em' font-size='80' x='10'>🛡️</text></svg>",sizes:"512x512",type:"image/svg+xml"}
+    ]
+  };
+  try{
+    var blob=new Blob([JSON.stringify(manifest)],{type:'application/json'});
+    var url=URL.createObjectURL(blob);
+    document.getElementById('pwa-manifest-link').href=url;
+  }catch(e){}
+})();
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -477,18 +507,27 @@ input,select,textarea,button{font-family:var(--font)}
     </div>
     <div style="padding:20px">
       <div class="fg">
+        <label class="fl">Display Name</label>
+        <input type="text" class="fi" id="pw-display-name" placeholder="Your display name">
+        <div style="font-size:10px;color:var(--G5);margin-top:3px">This is shown across the portal</div>
+      </div>
+      <div style="margin:6px 0 16px;border-top:1px solid var(--G8)"></div>
+      <div class="fg">
         <label class="fl">Current Password</label>
         <input type="password" class="fi" id="pw-current" placeholder="Enter current password">
       </div>
       <div class="fg">
         <label class="fl">New Password</label>
-        <input type="password" class="fi" id="pw-new" placeholder="Enter new password">
+        <input type="password" class="fi" id="pw-new" placeholder="Enter new password (min 6 chars)">
       </div>
       <div class="fg">
         <label class="fl">Confirm New Password</label>
         <input type="password" class="fi" id="pw-confirm" placeholder="Confirm new password">
       </div>
-      <button class="btn btn-R" onclick="App.changePassword()">Update Password</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn" style="flex:1;background:var(--blu-bg);color:var(--blu);border:2px solid var(--blu);font-weight:700" onclick="App.saveAdminName()">Save Name</button>
+        <button class="btn btn-R" style="flex:1" onclick="App.changePassword()">Update Password</button>
+      </div>
     </div>
   </div>
 </div>
@@ -596,7 +635,10 @@ input,select,textarea,button{font-family:var(--font)}
     </div>
     <div class="fg">
       <label class="fl" style="color:var(--G5)">Password</label>
-      <input class="fi" id="adm-li-p" type="password" placeholder="Enter password" autocomplete="current-password" style="background:var(--G3);border-color:var(--G3);color:var(--W)" onkeydown="if(event.key==='Enter')App.adminLogin()">
+      <div style="position:relative">
+        <input class="fi" id="adm-li-p" type="password" placeholder="Enter password" autocomplete="current-password" style="background:var(--G3);border-color:var(--G3);color:var(--W);padding-right:44px" onkeydown="if(event.key==='Enter')App.adminLogin()">
+        <button type="button" onclick="var f=document.getElementById('adm-li-p');f.type=f.type==='password'?'text':'password';this.textContent=f.type==='password'?'👁️':'🙈'" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--G5);padding:0;line-height:1">👁️</button>
+      </div>
     </div>
     <div id="adm-li-err" style="display:none;background:var(--Rbg);border:1px solid var(--Rl);border-radius:8px;padding:10px;font-size:12px;color:var(--R);margin-bottom:12px"></div>
     <button class="btn btn-R" style="width:100%;margin-top:4px" id="adm-li-btn" onclick="App.adminLogin()">Sign In →</button>
@@ -604,12 +646,12 @@ input,select,textarea,button{font-family:var(--font)}
   <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--G5)">Employees → use the Employee Portal</div>
 </div>
 </div>
-<div id="s-admin" class="scr"><div class="topbar"><div class="tb-l"><div class="tb-b" style="font-size:15px;font-weight:900;letter-spacing:-0.3px">Cognitive <em style="font-style:normal;color:var(--R)">Solutions</em></div><span style="font-size:9px;color:var(--G5);margin-left:6px;font-weight:600" id="tb-date-str"></span></div><div class="tb-r" style="position:relative"><div class="tb-help" onclick="App.openPwModal()" title="Change Password" style="margin-right:6px">🔑</div><span style="font-size:12px;color:var(--G5)" id="a-nm"></span><button class="tb-out" onclick="App.logout()">Out</button></div></div><div class="ct" style="padding-bottom:66px"><div id="ap-dash" class="pg on">
+<div id="s-admin" class="scr"><div class="topbar"><div class="tb-l"><div class="tb-b" style="font-size:22px;font-weight:900;letter-spacing:-0.5px;line-height:1">Cognitive <em style="font-style:normal;color:var(--R)">Solutions</em></div></div><div class="tb-r" style="position:relative"><div class="tb-help" onclick="App.openPwModal()" title="Change Password" style="margin-right:6px">🔑</div><span style="font-size:12px;color:var(--G5)" id="a-nm"></span><button class="tb-out" onclick="App.logout()">Out</button></div></div><div class="ct" style="padding-bottom:66px"><div id="ap-dash" class="pg on">
 <!-- Welcome Header -->
 <div style="background:var(--G1);border-radius:var(--rl);padding:16px;margin-bottom:12px;border:2px solid var(--G3);box-shadow:var(--sh3d)">
 <div style="display:flex;align-items:center;justify-content:space-between">
-<div><div style="font-size:18px;font-weight:800;color:var(--W)">Welcome, <span style="color:var(--R)" id="dash-name">Admin</span></div><div style="font-size:11px;color:var(--G5);margin-top:3px" id="dash-date"></div><div style="font-size:9px;color:var(--G6);margin-top:2px" id="dash-ver"></div></div>
-<div style="text-align:right"><div style="font-size:22px;font-weight:800;color:var(--R);font-family:monospace" id="dash-clock"></div><div style="font-size:9px;color:var(--G6);font-weight:700">LIVE</div></div>
+<div><div style="font-size:20px;font-weight:900;color:var(--W)">Welcome, <span style="color:var(--R)" id="dash-name">Admin</span> 👋</div><div style="font-size:11px;color:var(--G5);margin-top:4px" id="dash-today-date"></div></div>
+
 </div></div>
 <!-- Today Stats -->
 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px">
@@ -1011,19 +1053,30 @@ var btn=document.getElementById('rg-btn');btn.innerHTML='<div class="spinner"></
 try{var users=F.arr(await F.g('users'));if(users.find(function(x){return(x.username||'').toLowerCase()===u})){U.toast('Taken','err');return}
 await F.push('users',{name:n,username:u,password:document.getElementById('rg-p').value,wa:document.getElementById('rg-w').value.trim(),deviceId:'',approved:false,role:'employee',createdAt:new Date().toISOString()});
 U.toast('Registered!','ok');S.p('ok');this.ltab('si')}catch(e){U.toast('Error','err')}finally{btn.innerHTML='Register →';btn.disabled=false}},
-logout:function(){S.p('nav');ME=null;_adminBackup=null;_rpts=[];_att=[];_plans=[];if(App._dashClock)clearInterval(App._dashClock);if(App._notifInterval)clearInterval(App._notifInterval);localStorage.removeItem('cs_s');localStorage.removeItem('csvt8');this.restore()},
+logout:function(){S.p('nav');ME=null;_adminBackup=null;_rpts=[];_att=[];_plans=[];if(App._dashClock)clearInterval(App._dashClock);if(App._notifInterval)clearInterval(App._notifInterval);localStorage.removeItem('cs_s');localStorage.removeItem('csvt8');localStorage.removeItem('cs_adm_sess');try{if(navigator.clearAppBadge)navigator.clearAppBadge()}catch(e){};this.restore()},
 showAdmin:function(){
   this.scr('s-admin');
   document.getElementById('a-nm').textContent=ME.name;
-  /* Set date in topbar */
-  var dateEl=document.getElementById('tb-date-str');
-  if(dateEl){var d=new Date();dateEl.textContent=d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'})}
   this.loadDash();
-  /* Start notification polling */
+  /* Start notification polling + request PWA notification permission */
   App.startNotifPolling();
+  setTimeout(function(){App.requestNotifPermission()},2000);
 },
+save:function(){try{localStorage.setItem('cs_adm_sess',JSON.stringify({id:ME.id,name:ME.name,role:ME.role,username:ME.username,ts:Date.now()}))}catch(e){}},
 restore:function(){
-  /* Always show login screen — no auto-login */
+  /* Check for saved session (persistent login) */
+  try{
+    var sess=localStorage.getItem('cs_adm_sess');
+    if(sess){
+      var s=JSON.parse(sess);
+      /* Session valid for 30 days */
+      if(s&&s.id&&s.role==='admin'&&(Date.now()-s.ts)<30*24*60*60*1000){
+        ME={id:s.id,name:s.name,role:s.role,username:s.username};
+        this.showAdmin();return;
+      }
+    }
+  }catch(e){}
+  /* No valid session - show login */
   this.scr('s-login');
   document.getElementById('adm-li-u').value='';
   document.getElementById('adm-li-p').value='';
@@ -1044,7 +1097,7 @@ adminLogin:async function(){
     if(found){
       if(found.password!==p){errEl.textContent='Incorrect password.';errEl.style.display='block';return}
       ME={id:found.id,name:found.name,role:'admin',username:found.username};
-      S.p('ok');this.showAdmin();return;
+      this.save();S.p('ok');this.showAdmin();return;
     }
     /* Fallback: hardcoded master admin (for first-time setup before Firebase admin is created) */
     if(u===C.ADMIN_U&&p===C.ADMIN_P){
@@ -1054,7 +1107,7 @@ adminLogin:async function(){
         try{await F.push('users',{name:C.ADMIN_N,username:C.ADMIN_U,password:C.ADMIN_P,role:'admin',approved:true,blocked:false,createdAt:new Date().toISOString()})}catch(e){}
       }
       ME={id:'admin',name:C.ADMIN_N,role:'admin',username:C.ADMIN_U};
-      S.p('ok');this.showAdmin();return;
+      this.save();S.p('ok');this.showAdmin();return;
     }
     errEl.textContent='Incorrect username or password.';errEl.style.display='block';
   }catch(e){
@@ -1731,11 +1784,10 @@ loadDash:async function(){showLoad('Loading Dashboard','Fetching team data...');
 var allPlans=F.arr(await F.g('plans'));var missedCount=allPlans.filter(function(p){return(p.status==='missed')||(p.date<t&&(!p.status||p.status==='pending'))}).length;
 /* Welcome header */
 document.getElementById('dash-name').textContent=ME.name;
-var now=new Date();document.getElementById('dash-date').textContent=now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-document.getElementById('dash-ver').textContent=APP_VERSION.ver+' · '+APP_VERSION.date+' · '+APP_VERSION.time;
-document.getElementById('dash-clock').textContent=now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+var now=new Date();
+var todayDateEl=document.getElementById('dash-today-date');
+if(todayDateEl)todayDateEl.textContent=now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 if(this._dashClock)clearInterval(this._dashClock);
-this._dashClock=setInterval(function(){var el=document.getElementById('dash-clock');if(el)el.textContent=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'})},1000);
 /* Today stats */
 var todayA=a.filter(function(x){return x.date===t});var todayR=r.filter(function(x){return x.date===t});
 var present=0,lateCnt=0,graceCnt=0;todayA.forEach(function(att){var ac=attClassHist(att.time||'');if(ac.status==='ontime'||ac.status==='grace')present++;else if(ac.status==='late')lateCnt++});
@@ -1853,12 +1905,12 @@ appE:async function(id,name){
   sal=parseInt(sal)||0;
   try{await F.up('users/'+id,{approved:true,blocked:false,salary:sal,department:dept});U.toast((name||'Employee')+' approved with Rs '+sal.toLocaleString(),'ok');this.loadStaff();this.loadDash()}catch(e){U.toast('Error','err')}},
 editEmpSalary:function(uid,name,curSal,curDept){
-  /* Build modal */
+  /* Build modal - includes Name editing */
   var deptOpts=['Sales','C-Solar','CNC Social Media','Finance','Admin','Shop','Store','Karachi','Other'];
   var h='<div id="edit-emp-ov" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:999;display:flex;align-items:center;justify-content:center;padding:16px" onclick="if(event.target===this)this.remove()">';
   h+='<div style="background:var(--W);border-radius:16px;width:100%;max-width:380px;padding:20px;box-shadow:0 20px 60px rgba(0,0,0,.3)">';
-  h+='<div style="font-size:16px;font-weight:800;margin-bottom:4px">✏️ Edit Employee</div>';
-  h+='<div style="font-size:12px;color:var(--G5);margin-bottom:16px">'+name+'</div>';
+  h+='<div style="font-size:16px;font-weight:800;margin-bottom:16px">✏️ Edit Employee</div>';
+  h+='<div style="margin-bottom:12px"><label style="font-size:11px;font-weight:700;color:var(--G5);display:block;margin-bottom:4px">Full Name</label><input type="text" id="em-name" value="'+name.replace(/"/g,'&quot;')+'" style="width:100%;padding:10px;border:2px solid var(--G8);border-radius:8px;font-size:14px;font-weight:700"></div>';
   h+='<div style="margin-bottom:12px"><label style="font-size:11px;font-weight:700;color:var(--G5);display:block;margin-bottom:4px">Basic Salary (Rs)</label><input type="number" id="em-sal" value="'+(curSal||0)+'" style="width:100%;padding:10px;border:2px solid var(--G8);border-radius:8px;font-size:14px;font-weight:700"></div>';
   h+='<div style="margin-bottom:16px"><label style="font-size:11px;font-weight:700;color:var(--G5);display:block;margin-bottom:4px">Department</label><select id="em-dept" style="width:100%;padding:10px;border:2px solid var(--G8);border-radius:8px;font-size:13px;-webkit-appearance:auto"><option value="">— Select —</option>';
   deptOpts.forEach(function(d){h+='<option value="'+d+'"'+(d===curDept?' selected':'')+'>'+d+'</option>'});
@@ -1869,10 +1921,12 @@ editEmpSalary:function(uid,name,curSal,curDept){
   document.body.insertAdjacentHTML('beforeend',h);
   document.getElementById('em-sal').focus();
 },
-_saveEmpEdit:function(uid,name){
+_saveEmpEdit:async function(uid,name){
+  var newName=document.getElementById('em-name')?document.getElementById('em-name').value.trim():name;
+  if(!newName){U.toast('Name cannot be empty','warn');return;}
   var sal=parseInt(document.getElementById('em-sal').value)||0;
   var dept=document.getElementById('em-dept').value||'';
-  F.up('users/'+uid,{salary:sal,department:dept}).then(function(){
+  F.up('users/'+uid,{name:newName,salary:sal,department:dept}).then(function(){
     U.toast(name+': Rs '+sal.toLocaleString()+' · '+dept+' ✅','ok');
     document.getElementById('edit-emp-ov').remove();
     App.loadStaff();
@@ -4672,10 +4726,32 @@ App.openPwModal=function(){
   var modal=document.getElementById('pw-modal');
   if(modal){
     modal.style.display='flex';
+    /* Pre-fill current name */
+    var nameField=document.getElementById('pw-display-name');
+    if(nameField&&ME)nameField.value=ME.name||'';
+    var nameField=document.getElementById('pw-display-name');
+    if(nameField&&ME)nameField.value=ME.name||'';
     document.getElementById('pw-current').value='';
     document.getElementById('pw-new').value='';
     document.getElementById('pw-confirm').value='';
   }
+};
+
+App.saveAdminName=async function(){
+  var newName=document.getElementById('pw-display-name').value.trim();
+  if(!newName){U.toast('Name cannot be empty','warn');return;}
+  if(newName===ME.name){U.toast('Name unchanged','warn');return;}
+  try{
+    if(ME.id&&ME.id!=='admin'){
+      await F.up('users/'+ME.id,{name:newName});
+    }
+    ME.name=newName;
+    App.save();
+    document.getElementById('a-nm').textContent=newName;
+    var dn=document.getElementById('dash-name');if(dn)dn.textContent=newName;
+    U.toast('✅ Name updated to "'+newName+'"','ok');
+    App.closePwModal();
+  }catch(e){U.toast('Error saving name','err');}
 };
 
 App.closePwModal=function(){
@@ -4828,51 +4904,93 @@ App._notifLastTs = null;
 App._notifInterval = null;
 App._notifCount = 0;
 
+/* ── Badge API helper (works on iPhone homescreen PWA iOS 16.4+) ── */
+App._setBadge = function(n){
+  try{
+    if(n>0){if(navigator.setAppBadge)navigator.setAppBadge(n)}
+    else{if(navigator.clearAppBadge)navigator.clearAppBadge()}
+  }catch(e){}
+};
+
+/* Request notification permission for PWA alerts */
+App.requestNotifPermission = function(){
+  if(!('Notification' in window)) return;
+  if(Notification.permission === 'default'){
+    Notification.requestPermission().then(function(p){
+      if(p==='granted') U.toast('🔔 Notifications enabled!','ok');
+    });
+  }
+};
+
+/* Show PWA notification popup */
+App._showPWANotif = function(title, body){
+  try{
+    if('Notification' in window && Notification.permission === 'granted'){
+      new Notification(title,{
+        body: body,
+        icon: 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2218%22 fill=%22%23b91c1c%22/><text y=%22.9em%22 font-size=%2270%22 x=%2215%22>📋</text></svg>',
+        tag: 'cs-notif',
+        renotify: true
+      });
+    }
+  }catch(e){}
+};
+
 App.startNotifPolling = function(){
   if(App._notifInterval)clearInterval(App._notifInterval);
-  /* Snapshot current newest report timestamp as baseline */
-  F.g('reports').then(function(data){
-    var rpts = F.arr(data);
-    if(rpts.length){
-      rpts.sort(function(a,b){return(b.ts||'').localeCompare(a.ts||'')});
-      App._notifLastTs = rpts[0].ts || null;
-    } else {
-      App._notifLastTs = new Date().toISOString();
-    }
-    App._notifCount = 0;
+  
+  /* Restore persisted count from localStorage */
+  try{
+    var saved=localStorage.getItem('cs_notif_ts');
+    if(saved){App._notifLastTs=saved;}
+    else{App._notifLastTs=new Date().toISOString();}
+    var savedCount=parseInt(localStorage.getItem('cs_notif_count')||'0');
+    App._notifCount=savedCount;
     App._updateNotifBadge();
-  }).catch(function(){App._notifLastTs = new Date().toISOString()});
+  }catch(e){App._notifLastTs=new Date().toISOString();}
 
-  /* Poll every 45 seconds */
+  /* Poll every 30 seconds for new reports AND leaves */
   App._notifInterval = setInterval(function(){
     if(!ME || ME.role !== 'admin') return;
-    F.g('reports').then(function(data){
-      var rpts = F.arr(data).filter(function(r){
-        return r.ts && r.ts > (App._notifLastTs || '');
-      });
-      if(rpts.length > 0){
-        App._notifCount += rpts.length;
-        /* Update baseline */
-        rpts.sort(function(a,b){return b.ts.localeCompare(a.ts)});
-        App._notifLastTs = rpts[0].ts;
+    var lastTs = App._notifLastTs;
+    Promise.all([F.g('reports'),F.g('leaves')]).then(function(results){
+      var newRpts = F.arr(results[0]).filter(function(r){return r.ts&&r.ts>lastTs});
+      var newLeaves = F.arr(results[1]).filter(function(l){return l.ts&&l.ts>lastTs&&l.status==='pending'});
+      var total = newRpts.length + newLeaves.length;
+      if(total > 0){
+        App._notifCount += total;
+        /* Update baseline to latest ts */
+        var allNew = newRpts.concat(newLeaves);
+        allNew.sort(function(a,b){return b.ts.localeCompare(a.ts)});
+        App._notifLastTs = allNew[0].ts;
+        /* Persist */
+        try{localStorage.setItem('cs_notif_ts',App._notifLastTs);localStorage.setItem('cs_notif_count',App._notifCount)}catch(e){}
         App._updateNotifBadge();
-        /* Show toast */
-        var names = [...new Set(rpts.map(function(r){return r.userName||'Someone'}))];
-        U.toast('📝 '+names.slice(0,2).join(', ')+(names.length>2?' +'+( names.length-2)+' more':'')+' submitted '+(rpts.length>1?rpts.length+' reports':'a report'),'ok');
+        /* Toast */
+        var msgs=[];
+        if(newRpts.length){var names=[...new Set(newRpts.map(function(r){return r.userName||'Someone'}))];msgs.push('📝 '+names.slice(0,2).join(', ')+(names.length>2?' +more':'')+' submitted '+(newRpts.length>1?newRpts.length+' reports':'a report'));}
+        if(newLeaves.length){msgs.push('📋 '+newLeaves.length+' new leave request'+(newLeaves.length>1?'s':''));}
+        if(msgs.length){
+          U.toast(msgs.join(' · '),'ok');
+          App._showPWANotif('Cognitive Solutions — New Activity',msgs.join(' · '));
+        }
       }
     }).catch(function(){});
-  }, 45000);
+  }, 30000);
 };
 
 App._updateNotifBadge = function(){
   var badge = document.getElementById('notif-badge');
-  if(!badge) return;
-  if(App._notifCount > 0){
-    badge.textContent = App._notifCount > 99 ? '99+' : App._notifCount;
-    badge.style.display = 'block';
-  } else {
-    badge.style.display = 'none';
+  if(badge){
+    if(App._notifCount > 0){
+      badge.textContent = App._notifCount > 99 ? '99+' : App._notifCount;
+      badge.style.display = 'block';
+    } else {
+      badge.style.display = 'none';
+    }
   }
+  /* Update homescreen icon badge (iPhone PWA) */
+  App._setBadge(App._notifCount);
 };
 
 /* Clear badge when admin opens Activity tab */
@@ -4880,8 +4998,9 @@ App._updateNotifBadge = function(){
   var origAnav = App.anav;
   App.anav = function(p){
     origAnav.apply(this, arguments);
-    if(p === 'rpts'){
+    if(p === 'rpts' || p === 'att'){
       App._notifCount = 0;
+      try{localStorage.setItem('cs_notif_count','0')}catch(e){}
       App._updateNotifBadge();
     }
   };
