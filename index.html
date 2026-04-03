@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#1a1a1a">
-<title>CS Admin Portal V41 Enhanced — Import & Password Management</title>
+<title>Cognitive Solutions — Admin Portal</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -21,7 +21,7 @@ input,select,textarea,button{font-family:var(--font)}
 .t-ok{background:#f0fdf4;color:#166534;border-color:#86efac}.t-err{background:#fef2f2;color:#991b1b;border-color:#fca5a5}.t-warn{background:#fffbeb;color:#92400e;border-color:#fcd34d}.t-info{background:#f0f4ff;color:#1e3a5f;border-color:#93c5fd}
 @keyframes tIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
 .scr{display:none;min-height:100dvh;flex-direction:column}.scr.on{display:flex}
-#s-login{background:var(--G1);align-items:center;justify-content:center;padding:24px}
+#s-login{background:var(--G1);align-items:center;justify-content:center;padding:24px;min-height:100dvh}
 .lw{width:100%;max-width:400px}.lh{text-align:center;margin-bottom:30px;color:var(--W)}
 .lh-icon{width:60px;height:60px;border-radius:50%;border:3px solid var(--R);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:26px}
 .lh-t{font-size:22px;font-weight:800}.lh-t em{color:var(--R);font-style:normal}.lh-s{font-size:12px;color:var(--G5);margin-top:4px}
@@ -139,7 +139,7 @@ input,select,textarea,button{font-family:var(--font)}
 .ic-u{border-left-color:var(--R);background:var(--Rbg)}.ic-i{border-left-color:var(--amb);background:var(--amb-bg)}.ic-g{border-left-color:var(--grn);background:var(--grn-bg)}
 .ic-from{font-size:10px;font-weight:700;text-transform:uppercase;margin-bottom:3px;color:var(--G4)}.ic-u .ic-from{color:var(--R)}.ic-i .ic-from{color:var(--amb)}.ic-g .ic-from{color:var(--grn)}
 .ic-body{font-size:13px;color:var(--G3);line-height:1.5}.ic-time{font-size:10px;color:var(--G5);margin-top:3px}
-.ei{background:var(--W);border-radius:var(--r);border:2px solid var(--G8);padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px;box-shadow:var(--sh3d)}
+.ei{background:var(--W);border-radius:var(--r);border:2px solid var(--G8);padding:12px;margin-bottom:8px;display:flex;align-items:flex-start;gap:10px;box-shadow:var(--sh3d);flex-wrap:wrap}
 .ei-info{flex:1;min-width:0}.ei-nm{font-weight:700;font-size:13px}.ei-det{font-size:11px;color:var(--G5);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:12px;border:1px solid}.badge-ok{background:var(--grn-bg);color:var(--grn);border-color:#86efac}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
@@ -582,8 +582,29 @@ input,select,textarea,button{font-family:var(--font)}
   </div>
 </div>
 <div class="load-ov" id="load-ov"><div class="load-box"><div class="load-spin"></div><div class="load-msg" id="load-msg">Loading...</div><div class="load-sub" id="load-sub"></div></div></div>
-<div id="s-login" class="scr" style="display:none"></div>
-<div id="s-admin" class="scr"><div class="topbar"><div class="tb-l"><div class="tb-b">CS <em>Admin Portal</em></div><span style="font-size:9px;font-weight:700;padding:3px 10px;border-radius:16px;background:var(--R);color:var(--W)">V41</span><span style="font-size:8px;color:var(--G5);margin-left:4px">27Mar2026</span></div><div class="tb-r"><div class="tb-import" onclick="ImportManager.open()" style="margin-right:6px"><span style="font-size:16px">📥</span><span>Import</span></div><div class="tb-help" onclick="App.openPwModal()" title="Change Password" style="margin-right:6px">🔑</div><span style="font-size:12px;color:var(--G5)" id="a-nm"></span><button class="tb-out" onclick="App.logout()">Out</button></div></div><div class="ct" style="padding-bottom:66px"><div id="ap-dash" class="pg on">
+<div id="s-login" class="scr" style="display:none;background:var(--G1);align-items:center;justify-content:center;min-height:100dvh;padding:24px">
+<div style="width:100%;max-width:380px">
+  <div style="text-align:center;margin-bottom:32px">
+    <div style="font-size:28px;font-weight:900;color:var(--W);letter-spacing:-0.5px">Cognitive <span style="color:var(--R)">Solutions</span></div>
+    <div style="font-size:12px;color:var(--G5);margin-top:4px;font-weight:600">Admin Portal · Secure Access</div>
+  </div>
+  <div style="background:var(--G2);border-radius:16px;padding:24px;border:1px solid var(--G3)">
+    <div style="font-size:14px;font-weight:800;color:var(--W);margin-bottom:16px">🔐 Sign In</div>
+    <div class="fg">
+      <label class="fl" style="color:var(--G5)">Username</label>
+      <input class="fi" id="adm-li-u" placeholder="Enter username" autocomplete="username" style="background:var(--G3);border-color:var(--G3);color:var(--W)" onkeydown="if(event.key==='Enter')document.getElementById('adm-li-p').focus()">
+    </div>
+    <div class="fg">
+      <label class="fl" style="color:var(--G5)">Password</label>
+      <input class="fi" id="adm-li-p" type="password" placeholder="Enter password" autocomplete="current-password" style="background:var(--G3);border-color:var(--G3);color:var(--W)" onkeydown="if(event.key==='Enter')App.adminLogin()">
+    </div>
+    <div id="adm-li-err" style="display:none;background:var(--Rbg);border:1px solid var(--Rl);border-radius:8px;padding:10px;font-size:12px;color:var(--R);margin-bottom:12px"></div>
+    <button class="btn btn-R" style="width:100%;margin-top:4px" id="adm-li-btn" onclick="App.adminLogin()">Sign In →</button>
+  </div>
+  <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--G5)">Employees → use the Employee Portal</div>
+</div>
+</div>
+<div id="s-admin" class="scr"><div class="topbar"><div class="tb-l"><div class="tb-b" style="font-size:15px;font-weight:900;letter-spacing:-0.3px">Cognitive <em style="font-style:normal;color:var(--R)">Solutions</em></div><span style="font-size:9px;color:var(--G5);margin-left:6px;font-weight:600" id="tb-date-str"></span></div><div class="tb-r" style="position:relative"><div class="tb-help" onclick="App.openPwModal()" title="Change Password" style="margin-right:6px">🔑</div><span style="font-size:12px;color:var(--G5)" id="a-nm"></span><button class="tb-out" onclick="App.logout()">Out</button></div></div><div class="ct" style="padding-bottom:66px"><div id="ap-dash" class="pg on">
 <!-- Welcome Header -->
 <div style="background:var(--G1);border-radius:var(--rl);padding:16px;margin-bottom:12px;border:2px solid var(--G3);box-shadow:var(--sh3d)">
 <div style="display:flex;align-items:center;justify-content:space-between">
@@ -634,7 +655,34 @@ input,select,textarea,button{font-family:var(--font)}
 <!-- Team Status Grid (bottom) -->
 <div class="sec">👥 Team Status — Today</div>
 <div id="dk-team" style="margin-bottom:12px"><div class="loading"><div class="spinner"></div></div></div>
-</div><div id="ap-staff" class="pg"><div class="card"><div class="card-hd"><div class="card-t">➕ Add Employee</div></div><div class="fi-row"><div class="fg"><label class="fl">Name</label><input class="fi" id="ae-n"></div><div class="fg"><label class="fl">Username</label><input class="fi" id="ae-u"></div></div><div class="fi-row"><div class="fg"><label class="fl">Password</label><input class="fi" id="ae-p" type="password"></div><div class="fg"><label class="fl">WhatsApp</label><input class="fi" id="ae-w"></div></div><div class="fi-row"><div class="fg"><label class="fl">Basic Salary (Rs)</label><input class="fi" id="ae-sal" type="number" placeholder="e.g. 55000"></div><div class="fg"><label class="fl">Department</label><select class="fi" id="ae-dept" style="-webkit-appearance:auto"><option value="">— Select —</option><option value="Sales">Sales</option><option value="C-Solar">C-Solar</option><option value="CNC Social Media">CNC Social Media</option><option value="Finance">Finance</option><option value="Admin">Admin</option><option value="Shop">Shop</option><option value="Store">Store</option><option value="Karachi">Karachi</option><option value="Other">Other</option></select></div></div><button class="btn btn-R" onclick="App.addEmp()">Add</button></div><div class="sec">Active</div><div id="a-el"></div><div class="sec" style="color:var(--R)">Blocked / Suspended</div><div id="a-bl"></div><div class="sec" style="color:var(--amb)">Pending</div><div id="a-pl"></div></div><div id="ap-att" class="pg">
+</div><div id="ap-staff" class="pg">
+
+<!-- ── ADMIN TOOLS ── -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+  <button class="btn" style="background:var(--G1);color:var(--W);border:2px solid var(--G3);font-size:12px;font-weight:700;padding:12px 8px;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:6px" onclick="ImportManager.open()">📥 Import Data</button>
+  <button class="btn" style="background:var(--G1);color:var(--W);border:2px solid var(--G3);font-size:12px;font-weight:700;padding:12px 8px;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:6px" onclick="App.openPwModal()">🔐 My Password</button>
+</div>
+
+<!-- ── ADD EMPLOYEE ── -->
+<div class="card"><div class="card-hd"><div class="card-t">➕ Add Employee</div></div><div class="fi-row"><div class="fg"><label class="fl">Name</label><input class="fi" id="ae-n"></div><div class="fg"><label class="fl">Username</label><input class="fi" id="ae-u"></div></div><div class="fi-row"><div class="fg"><label class="fl">Password</label><input class="fi" id="ae-p" type="password"></div><div class="fg"><label class="fl">WhatsApp</label><input class="fi" id="ae-w"></div></div><div class="fi-row"><div class="fg"><label class="fl">Basic Salary (Rs)</label><input class="fi" id="ae-sal" type="number" placeholder="e.g. 55000"></div><div class="fg"><label class="fl">Department</label><select class="fi" id="ae-dept" style="-webkit-appearance:auto"><option value="">— Select —</option><option value="Sales">Sales</option><option value="C-Solar">C-Solar</option><option value="CNC Social Media">CNC Social Media</option><option value="Finance">Finance</option><option value="Admin">Admin</option><option value="Shop">Shop</option><option value="Store">Store</option><option value="Karachi">Karachi</option><option value="Other">Other</option></select></div></div><button class="btn btn-R" onclick="App.addEmp()">Add Employee</button></div>
+
+<!-- ── ADD ADMIN ── -->
+<div class="card" style="border:2px solid var(--R)"><div class="card-hd"><div class="card-t">🛡️ Add New Admin</div></div>
+<div style="font-size:11px;color:var(--G5);margin-bottom:10px;padding:8px;background:var(--Rbg);border-radius:8px;border:1px solid var(--Rl)">⚠️ Admin accounts have full access to all data and settings. Create carefully.</div>
+<div class="fi-row"><div class="fg"><label class="fl">Admin Name</label><input class="fi" id="aa-n" placeholder="Full name"></div><div class="fg"><label class="fl">Username</label><input class="fi" id="aa-u" placeholder="Login username"></div></div>
+<div class="fi-row"><div class="fg"><label class="fl">Password</label><input class="fi" id="aa-p" type="password" placeholder="Min 6 chars"></div><div class="fg"><label class="fl">Confirm Password</label><input class="fi" id="aa-cp" type="password" placeholder="Repeat password"></div></div>
+<button class="btn btn-R" onclick="App.addAdmin()">Create Admin Account</button></div>
+
+<!-- ── RESET USER PASSWORD ── -->
+<div class="card"><div class="card-hd"><div class="card-t">🔑 Reset User Password</div></div>
+<div class="fg"><label class="fl">Select Employee</label><select class="fi fi-sel" id="staff-reset-emp"><option value="">— Select Employee —</option></select></div>
+<div class="fi-row"><div class="fg"><label class="fl">New Password</label><input class="fi" id="staff-reset-pw" type="password" placeholder="Min 6 chars"></div><div class="fg"><label class="fl">Confirm Password</label><input class="fi" id="staff-reset-cpw" type="password" placeholder="Repeat"></div></div>
+<button class="btn" style="background:var(--blu-bg);color:var(--blu);border:2px solid var(--blu);font-weight:700" onclick="App.staffResetPw()">Reset Password</button></div>
+
+<div class="sec">Active</div><div id="a-el"></div>
+<div class="sec" style="color:var(--R)">Blocked / Suspended</div><div id="a-bl"></div>
+<div class="sec" style="color:var(--amb)">Pending</div><div id="a-pl"></div>
+</div><div id="ap-att" class="pg">
 <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px" id="att-subtabs">
 <button class="adm-chip on" onclick="App.attSub('records',this)">📊 Records</button>
 <button class="adm-chip" onclick="App.attSub('deductions',this)">💸 Deductions</button>
@@ -881,13 +929,13 @@ input,select,textarea,button{font-family:var(--font)}
 </div>
 
 </div>
-<div id="ap-instr" class="pg"><div class="card"><div class="card-hd"><div class="card-t">📢 Send Instruction</div></div><div class="fg"><label class="fl">To</label><select class="fi fi-sel" id="ins-to"><option value="all">All</option></select></div><div class="fg"><label class="fl">Message <span class="wc" id="ins-body-wc">0/2000</span></label><textarea class="fi fi-ta" id="ins-body" oninput="App.wordCheck(this,'ins-body-wc')"></textarea></div><div class="fg"><label class="fl">Priority</label><select class="fi fi-sel" id="ins-pri"><option value="routine">🔵 Routine</option><option value="important">🟡 Important</option><option value="urgent">🔴 Urgent</option><option value="good">🟢 Good News</option></select></div><button class="btn btn-R" onclick="App.sendIns()">📨 Send</button></div><div class="sec">Sent</div><div id="a-ilog"></div></div></div><div class="bnav"><div class="bn on" onclick="App.anav('dash')"><div class="bn-i">🏠</div><div class="bn-l">Home</div></div><div class="bn" onclick="App.anav('att')"><div class="bn-i">✅</div><div class="bn-l">Attendance</div></div><div class="bn" onclick="App.anav('rpts')"><div class="bn-i">📝</div><div class="bn-l">Activity</div></div><div class="bn" onclick="App.anav('vis')"><div class="bn-i">📍</div><div class="bn-l">Visits</div></div><div class="bn" onclick="App.anav('plan')"><div class="bn-i">📋</div><div class="bn-l">Plan</div></div><div class="bn" onclick="App.anav('cal')"><div class="bn-i">📅</div><div class="bn-l">Calendar</div></div><div class="bn" onclick="App.anav('sum')"><div class="bn-i">📊</div><div class="bn-l">Summary</div></div><div class="bn" onclick="App.anav('instr')"><div class="bn-i">📢</div><div class="bn-l">Announce</div></div><div class="bn" onclick="App.anav('appr')"><div class="bn-i">📑</div><div class="bn-l">Report/AI</div></div><div class="bn" onclick="App.anav('staff')"><div class="bn-i">👥</div><div class="bn-l">Staff</div></div></div></div>
+<div id="ap-instr" class="pg"><div class="card"><div class="card-hd"><div class="card-t">📢 Send Instruction</div></div><div class="fg"><label class="fl">To</label><select class="fi fi-sel" id="ins-to"><option value="all">All</option></select></div><div class="fg"><label class="fl">Message <span class="wc" id="ins-body-wc">0/2000</span></label><textarea class="fi fi-ta" id="ins-body" oninput="App.wordCheck(this,'ins-body-wc')"></textarea></div><div class="fg"><label class="fl">Priority</label><select class="fi fi-sel" id="ins-pri"><option value="routine">🔵 Routine</option><option value="important">🟡 Important</option><option value="urgent">🔴 Urgent</option><option value="good">🟢 Good News</option></select></div><button class="btn btn-R" onclick="App.sendIns()">📨 Send</button></div><div class="sec">Sent</div><div id="a-ilog"></div></div></div><div class="bnav"><div class="bn on" onclick="App.anav('dash')"><div class="bn-i">🏠</div><div class="bn-l">Home</div></div><div class="bn" onclick="App.anav('att')"><div class="bn-i">✅</div><div class="bn-l">Attendance</div></div><div class="bn" style="position:relative" onclick="App.anav('rpts')"><div class="bn-i">📝</div><div class="bn-l">Activity</div><span id="notif-badge" style="display:none;position:absolute;top:4px;right:8px;background:var(--R);color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:10px;min-width:16px;text-align:center;border:2px solid var(--W)">0</span></div><div class="bn" onclick="App.anav('vis')"><div class="bn-i">📍</div><div class="bn-l">Visits</div></div><div class="bn" onclick="App.anav('plan')"><div class="bn-i">📋</div><div class="bn-l">Plan</div></div><div class="bn" onclick="App.anav('cal')"><div class="bn-i">📅</div><div class="bn-l">Calendar</div></div><div class="bn" onclick="App.anav('sum')"><div class="bn-i">📊</div><div class="bn-l">Summary</div></div><div class="bn" onclick="App.anav('instr')"><div class="bn-i">📢</div><div class="bn-l">Announce</div></div><div class="bn" onclick="App.anav('appr')"><div class="bn-i">📑</div><div class="bn-l">Report/AI</div></div><div class="bn" onclick="App.anav('staff')"><div class="bn-i">👥</div><div class="bn-l">Staff</div></div></div></div>
 <div id="map-ov"><div class="map-sh"><div class="map-hd"><div id="map-nm" style="font-weight:700;font-size:14px">Location</div><button class="btn btn-ghost btn-sm" onclick="App.closeMap()">✕</button></div><div id="leaflet-map"></div><a id="map-gl" href="#" target="_blank" class="map-lk">📍 Google Maps →</a></div></div>
 <div id="photo-ov" onclick="this.classList.remove('on')"><img id="pv-img" src=""></div>
 <div id="help-ov" onclick="if(event.target===this)this.classList.remove('on')"><div class="help-sh"><div class="help-title">📖 Help <button class="btn btn-ghost btn-sm" onclick="document.getElementById('help-ov').classList.remove('on')">✕</button></div><div id="help-content"></div></div></div>
 <script>
 'use strict';
-const C={DB:'https://cs-activity-e32b0-default-rtdb.asia-southeast1.firebasedatabase.app/',ADMIN_U:'admin',ADMIN_N:'Muddasir',MAX_PH:5,PH_KB:200,KM_RATE:6.5,DED_LATE:200,DED_ABSENT:500,
+const C={DB:'https://cs-activity-e32b0-default-rtdb.asia-southeast1.firebasedatabase.app/',ADMIN_U:'admin',ADMIN_N:'Muddasir',ADMIN_P:'admin123',MAX_PH:5,PH_KB:200,KM_RATE:6.5,DED_LATE:200,DED_ABSENT:500,
 OFFICES:[{name:'Lahore HO (PECO Road)',lat:31.462915,lng:74.320000},{name:'Brandreth Road, Lahore',lat:31.575249,lng:74.323730},{name:'Karachi Office',lat:24.857580,lng:67.043633}],
 GEO_RADIUS:50,START_TIME:'10:00',GRACE_END:'10:15',ABSENT_TIME:'17:00',HALF_DAY:'13:00',END_TIME:'18:00',CHECKIN_START:'07:00',CHECKIN_END:'12:00',MAX_WORDS:2000,
 CLIENTS:['Ahmed Electronics','Shezan Factory','KJL','Packages Mall','Metro Cash & Carry','Nishat Mills','Sapphire Textile','Orient Electronics','Dawlance','PEL','Haier Pakistan','Siemens Pakistan','ABB Pakistan','Schneider Electric'],
@@ -963,11 +1011,62 @@ var btn=document.getElementById('rg-btn');btn.innerHTML='<div class="spinner"></
 try{var users=F.arr(await F.g('users'));if(users.find(function(x){return(x.username||'').toLowerCase()===u})){U.toast('Taken','err');return}
 await F.push('users',{name:n,username:u,password:document.getElementById('rg-p').value,wa:document.getElementById('rg-w').value.trim(),deviceId:'',approved:false,role:'employee',createdAt:new Date().toISOString()});
 U.toast('Registered!','ok');S.p('ok');this.ltab('si')}catch(e){U.toast('Error','err')}finally{btn.innerHTML='Register →';btn.disabled=false}},
-logout:function(){S.p('nav');ME=null;_adminBackup=null;_rpts=[];_att=[];_plans=[];if(App._dashClock)clearInterval(App._dashClock);localStorage.removeItem('cs_s');localStorage.removeItem('csvt8');window.location.href='Cs_Activity.html'},
-save:function(){localStorage.setItem('cs_s',JSON.stringify(ME))},
-restore:function(){ME={id:'admin',name:C.ADMIN_N,role:'admin'};this.save();this.showAdmin()},
-scr:function(id){document.querySelectorAll('.scr').forEach(function(s){s.classList.remove('on')});document.getElementById(id).classList.add('on')},
-showAdmin:function(){this.scr('s-admin');document.getElementById('a-nm').textContent=ME.name;this.loadDash()},
+logout:function(){S.p('nav');ME=null;_adminBackup=null;_rpts=[];_att=[];_plans=[];if(App._dashClock)clearInterval(App._dashClock);if(App._notifInterval)clearInterval(App._notifInterval);localStorage.removeItem('cs_s');localStorage.removeItem('csvt8');this.restore()},
+showAdmin:function(){
+  this.scr('s-admin');
+  document.getElementById('a-nm').textContent=ME.name;
+  /* Set date in topbar */
+  var dateEl=document.getElementById('tb-date-str');
+  if(dateEl){var d=new Date();dateEl.textContent=d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'})}
+  this.loadDash();
+  /* Start notification polling */
+  App.startNotifPolling();
+},
+restore:function(){
+  /* Always show login screen — no auto-login */
+  this.scr('s-login');
+  document.getElementById('adm-li-u').value='';
+  document.getElementById('adm-li-p').value='';
+  var errEl=document.getElementById('adm-li-err');if(errEl)errEl.style.display='none';
+},
+adminLogin:async function(){
+  var u=document.getElementById('adm-li-u').value.trim().toLowerCase();
+  var p=document.getElementById('adm-li-p').value;
+  var errEl=document.getElementById('adm-li-err');
+  var btn=document.getElementById('adm-li-btn');
+  errEl.style.display='none';
+  if(!u||!p){errEl.textContent='Please enter username and password.';errEl.style.display='block';return}
+  btn.innerHTML='<div class="spinner" style="width:16px;height:16px;border-width:2px"></div>';btn.disabled=true;
+  try{
+    /* First: check Firebase for admin users (supports multiple admins) */
+    var users=F.arr(await F.g('users'));
+    var found=users.find(function(x){return(x.username||'').toLowerCase()===u&&x.role==='admin'&&!x.blocked});
+    if(found){
+      if(found.password!==p){errEl.textContent='Incorrect password.';errEl.style.display='block';return}
+      ME={id:found.id,name:found.name,role:'admin',username:found.username};
+      S.p('ok');this.showAdmin();return;
+    }
+    /* Fallback: hardcoded master admin (for first-time setup before Firebase admin is created) */
+    if(u===C.ADMIN_U&&p===C.ADMIN_P){
+      /* Auto-save this admin to Firebase so future logins work */
+      var adminExists=users.find(function(x){return(x.username||'').toLowerCase()===C.ADMIN_U});
+      if(!adminExists){
+        try{await F.push('users',{name:C.ADMIN_N,username:C.ADMIN_U,password:C.ADMIN_P,role:'admin',approved:true,blocked:false,createdAt:new Date().toISOString()})}catch(e){}
+      }
+      ME={id:'admin',name:C.ADMIN_N,role:'admin',username:C.ADMIN_U};
+      S.p('ok');this.showAdmin();return;
+    }
+    errEl.textContent='Incorrect username or password.';errEl.style.display='block';
+  }catch(e){
+    /* Even if Firebase fails, allow hardcoded master admin login */
+    if(u===C.ADMIN_U&&p===C.ADMIN_P){
+      ME={id:'admin',name:C.ADMIN_N,role:'admin',username:C.ADMIN_U};
+      S.p('ok');this.showAdmin();return;
+    }
+    errEl.textContent='Connection error. Check network and try again.';errEl.style.display='block';
+  }finally{btn.innerHTML='Sign In →';btn.disabled=false}
+},
+scr:function(id){document.querySelectorAll('.scr').forEach(function(s){s.classList.remove('on');s.style.display=''});var el=document.getElementById(id);if(el){el.classList.add('on')}},
 showEmp:async function(){this.scr('s-emp');
 var bar=document.getElementById('admin-view-bar');if(bar){bar.style.display=_adminBackup?'flex':'none'}
 document.getElementById('w-nm').textContent=ME.name;document.getElementById('w-un').textContent='@'+(ME.username||'');
@@ -1695,17 +1794,59 @@ if(seeded>0){
 /* Active employees */
 document.getElementById('a-el').innerHTML=ac.length?ac.map(function(e){
   var sal=e.salary||0;var daily=sal?Math.round(sal/30):0;var dept=e.department||'—';
+  var isAdm=e.role==='admin';
   var salLine=sal?'<span style="font-size:10px;color:var(--G3)">Rs '+sal.toLocaleString()+' · Daily: '+daily.toLocaleString()+'</span>':'<span style="font-size:10px;color:var(--R)">⚠ No salary set</span>';
-  return'<div class="ei"><div class="av" style="background:'+U.clr(e.name)+'">'+U.ini(e.name)+'</div><div class="ei-info"><div class="ei-nm">'+e.name+' <span class="badge badge-ok">Active</span>'+(dept!=='—'?' <span style="font-size:8px;color:var(--G5);font-weight:600;padding:1px 5px;border:1px solid var(--G8);border-radius:4px">'+dept+'</span>':'')+'</div><div class="ei-det">@'+e.username+(e.wa?' · '+e.wa:'')+'</div><div>'+salLine+'</div></div><div style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn btn-ghost btn-sm" title="Summary Report" onclick="App.viewEmpReport(\''+e.id+'\')">📊</button><button class="btn btn-ghost btn-sm" title="Calendar" onclick="App.viewEmpCalendar(\''+e.id+'\')">📅</button><button class="btn btn-ghost btn-sm" title="Attendance" onclick="App.viewEmpAttendance(\''+e.id+'\')">✅</button><button class="btn btn-ghost btn-sm" title="Edit Salary &amp; Dept" onclick="App.editEmpSalary(\''+e.id+'\',\''+e.name.replace(/'/g,"\\'")+'\','+sal+',\''+(e.department||'').replace(/'/g,"\\'")+'\')">✏️</button><button class="btn btn-ghost btn-sm" title="Reset Device" onclick="App.rstD(\''+e.id+'\')">↺</button><button class="btn btn-sm" style="background:var(--amb-bg);color:var(--amb);border:2px solid #fcd34d;width:34px;height:34px;padding:0" title="Block" onclick="App.blockE(\''+e.id+'\',\''+e.name.replace(/'/g,"\\'")+'\')">🚫</button><button class="btn btn-sm" style="background:var(--Rbg);color:var(--R);border:2px solid var(--Rl);width:34px;height:34px;padding:0" title="Delete" onclick="App.delE(\''+e.id+'\',\''+e.name.replace(/'/g,"\\'")+'\')">✕</button></div></div>'}).join(''):'<div style="font-size:12px;color:var(--G5);padding:4px">No active employees</div>';
+  var roleTag=isAdm?'<span style="font-size:8px;font-weight:800;padding:2px 6px;border-radius:4px;background:var(--R);color:#fff;margin-left:4px">🛡️ Admin</span>':'';
+  return'<div class="ei" style="flex-direction:column;align-items:stretch"><div style="display:flex;align-items:center;gap:10px"><div class="av" style="background:'+U.clr(e.name)+';flex-shrink:0">'+U.ini(e.name)+'</div><div class="ei-info" style="flex:1;min-width:0"><div class="ei-nm">'+e.name+' <span class="badge badge-ok">Active</span>'+roleTag+(dept!=='—'?' <span style="font-size:8px;color:var(--G5);font-weight:600;padding:1px 5px;border:1px solid var(--G8);border-radius:4px">'+dept+'</span>':'')+'</div><div class="ei-det">@'+e.username+(e.wa?' · '+e.wa:'')+'</div><div>'+salLine+'</div></div></div>'+'<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:10px;padding-top:8px;border-top:1px solid var(--G8)">'+(isAdm?'':'<button class="btn btn-ghost btn-sm" title="Summary Report" onclick="App.viewEmpReport(\''+e.id+'\')">📊</button><button class="btn btn-ghost btn-sm" title="Calendar" onclick="App.viewEmpCalendar(\''+e.id+'\')">📅</button><button class="btn btn-ghost btn-sm" title="Attendance" onclick="App.viewEmpAttendance(\''+e.id+'\')">✅</button><button class="btn btn-ghost btn-sm" title="Edit Salary &amp; Dept" onclick="App.editEmpSalary(\''+e.id+'\',\''+e.name.replace(/'/g,"\\'")+'\','+sal+',\''+(e.department||'').replace(/'/g,"\\'")+'\')">✏️</button>')+'<button class="btn btn-ghost btn-sm" title="Reset Device" onclick="App.rstD(\''+e.id+'\')">↺</button><button class="btn btn-sm" style="background:var(--amb-bg);color:var(--amb);border:2px solid #fcd34d;padding:0 10px;height:34px" title="Block" onclick="App.blockE(\''+e.id+'\',\''+e.name.replace(/'/g,"\\'")+'\')">'+(isAdm?'🚫 Block Admin':'🚫')+'</button><button class="btn btn-sm" style="background:var(--Rbg);color:var(--R);border:2px solid var(--Rl);width:34px;height:34px;padding:0" title="Delete" onclick="App.delE(\''+e.id+'\',\''+e.name.replace(/'/g,"\\'")+'\')">✕</button></div></div>'}).join(''):'<div style="font-size:12px;color:var(--G5);padding:4px">No active employees</div>';
+
+/* Populate reset password dropdown */
+var allEmps=ac.filter(function(e){return e.role!=='admin'});
+var resetSel=document.getElementById('staff-reset-emp');
+if(resetSel){resetSel.innerHTML='<option value="">— Select Employee —</option>'+allEmps.map(function(e){return'<option value="'+e.id+'">'+e.name+' (@'+e.username+')</option>'}).join('')}
 
 /* Blocked employees */
-document.getElementById('a-bl').innerHTML=bl.length?bl.map(function(e){return'<div class="ei" style="opacity:.7;border-left:3px solid var(--R)"><div class="av" style="background:#666">'+U.ini(e.name)+'</div><div class="ei-info"><div class="ei-nm">'+e.name+' <span style="font-size:8px;font-weight:700;padding:2px 6px;border-radius:4px;background:var(--Rbg);color:var(--R)">🚫 Blocked</span></div><div class="ei-det">@'+e.username+(e.blockedAt?' · Blocked: '+e.blockedAt:'')+'</div></div><div style="display:flex;gap:4px"><button class="btn btn-sm" style="background:var(--grn-bg);color:var(--grn);border:2px solid #86efac" title="Unblock" onclick="App.unblockE(\''+e.id+'\',\''+e.name.replace(/'/g,"\\'")+'\')">✅ Unblock</button><button class="btn btn-sm" style="background:var(--Rbg);color:var(--R);border:2px solid var(--Rl);width:34px;height:34px;padding:0" title="Delete" onclick="App.delE(\''+e.id+'\',\''+e.name.replace(/'/g,"\\'")+'\')">✕</button></div></div>'}).join(''):'<div style="font-size:12px;color:var(--G5);padding:4px">None</div>';
+document.getElementById('a-bl').innerHTML=bl.length?bl.map(function(e){return'<div class="ei"><div class="av" style="background:#666">'+U.ini(e.name)+'</div><div class="ei-info" style="flex:1;min-width:0"><div class="ei-nm">'+e.name+' <span style="font-size:8px;font-weight:700;padding:2px 6px;border-radius:4px;background:var(--Rbg);color:var(--R)">🚫 Blocked</span></div><div class="ei-det">@'+e.username+(e.blockedAt?' · Blocked: '+e.blockedAt:'')+'</div></div><div style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn btn-sm" style="background:var(--grn-bg);color:var(--grn);border:2px solid #86efac" title="Unblock" onclick="App.unblockE(\''+e.id+'\',\''+e.name.replace(/'/g,"\\'")+'\')">✅ Unblock</button><button class="btn btn-sm" style="background:var(--Rbg);color:var(--R);border:2px solid var(--Rl);width:34px;height:34px;padding:0" title="Delete" onclick="App.delE(\''+e.id+'\',\''+e.name.replace(/'/g,"\\'")+'\')">✕</button></div></div>'}).join(''):'<div style="font-size:12px;color:var(--G5);padding:4px">None</div>';
 
 /* Pending employees */
-document.getElementById('a-pl').innerHTML=pe.length?pe.map(function(e){return'<div class="ei"><div class="av" style="background:'+U.clr(e.name)+'">'+U.ini(e.name)+'</div><div class="ei-info"><div class="ei-nm">'+e.name+'</div><div class="ei-det">@'+e.username+'</div></div><div style="display:flex;gap:4px"><button class="btn btn-R btn-sm" onclick="App.appE(\''+e.id+'\',\''+e.name.replace(/'/g,"\\'")+'\')">✓ Approve</button><button class="btn btn-sm" style="background:var(--Rbg);color:var(--R);border:2px solid var(--Rl);width:34px;height:34px;padding:0" onclick="App.delE(\''+e.id+'\',\''+e.name.replace(/'/g,"\\'")+'\')">✕</button></div></div>'}).join(''):'<div style="font-size:12px;color:var(--G5);padding:4px">None</div>'}catch(e){console.error('loadStaff:',e)}},
+document.getElementById('a-pl').innerHTML=pe.length?pe.map(function(e){return'<div class="ei"><div class="av" style="background:'+U.clr(e.name)+'">'+U.ini(e.name)+'</div><div class="ei-info" style="flex:1;min-width:0"><div class="ei-nm">'+e.name+'</div><div class="ei-det">@'+e.username+'</div></div><div style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn btn-R btn-sm" onclick="App.appE(\''+e.id+'\',\''+e.name.replace(/'/g,"\\'")+'\')">✓ Approve</button><button class="btn btn-sm" style="background:var(--Rbg);color:var(--R);border:2px solid var(--Rl);width:34px;height:34px;padding:0" onclick="App.delE(\''+e.id+'\',\''+e.name.replace(/'/g,"\\'")+'\')">✕</button></div></div>'}).join(''):'<div style="font-size:12px;color:var(--G5);padding:4px">None</div>';
+}catch(e){console.error('loadStaff:',e)}},
 addEmp:async function(){var n=document.getElementById('ae-n').value.trim(),u=document.getElementById('ae-u').value.trim().toLowerCase();if(!n||!u){U.toast('Fill fields','warn');return}
 var sal=parseInt(document.getElementById('ae-sal').value)||0;var dept=document.getElementById('ae-dept').value||'';
 try{await F.push('users',{name:n,username:u,password:document.getElementById('ae-p').value,wa:document.getElementById('ae-w').value.trim(),salary:sal,department:dept,approved:true,role:'employee',deviceId:'',createdAt:new Date().toISOString()});U.toast(n+' added!','ok');['ae-n','ae-u','ae-p','ae-w','ae-sal'].forEach(function(i){document.getElementById(i).value=''});document.getElementById('ae-dept').value='';this.loadStaff()}catch(e){U.toast('Error','err')}},
+addAdmin:async function(){
+  var n=document.getElementById('aa-n').value.trim();
+  var u=document.getElementById('aa-u').value.trim().toLowerCase();
+  var p=document.getElementById('aa-p').value;
+  var cp=document.getElementById('aa-cp').value;
+  if(!n||!u||!p){U.toast('Fill all fields','warn');return}
+  if(p.length<6){U.toast('Password min 6 characters','warn');return}
+  if(p!==cp){U.toast('Passwords do not match','err');return}
+  try{
+    var users=F.arr(await F.g('users'));
+    if(users.find(function(x){return(x.username||'').toLowerCase()===u})){U.toast('Username already taken','err');return}
+    await F.push('users',{name:n,username:u,password:p,role:'admin',approved:true,blocked:false,createdAt:new Date().toISOString(),createdBy:ME.id});
+    U.toast('✅ Admin "'+n+'" created!','ok');
+    ['aa-n','aa-u','aa-p','aa-cp'].forEach(function(i){document.getElementById(i).value=''});
+    this.loadStaff();
+  }catch(e){U.toast('Error creating admin','err')}
+},
+staffResetPw:async function(){
+  var uid=document.getElementById('staff-reset-emp').value;
+  var pw=document.getElementById('staff-reset-pw').value;
+  var cpw=document.getElementById('staff-reset-cpw').value;
+  if(!uid){U.toast('Select an employee','warn');return}
+  if(!pw||!cpw){U.toast('Fill password fields','warn');return}
+  if(pw.length<6){U.toast('Password min 6 characters','warn');return}
+  if(pw!==cpw){U.toast('Passwords do not match','err');return}
+  if(!confirm('Reset password for this employee?'))return;
+  try{
+    await F.up('users/'+uid,{password:pw,passwordResetBy:ME.id,passwordResetAt:new Date().toISOString()});
+    U.toast('✅ Password reset successfully','ok');
+    document.getElementById('staff-reset-pw').value='';
+    document.getElementById('staff-reset-cpw').value='';
+    document.getElementById('staff-reset-emp').value='';
+  }catch(e){U.toast('Error resetting password','err')}
+},
 appE:async function(id,name){
   var sal=window.prompt('Set basic salary for '+(name||'this employee')+' (Rs):','0');if(sal===null)return;
   var dept=window.prompt('Department:','Sales');if(dept===null)dept='';
@@ -4661,10 +4802,11 @@ App.changeUserPassword=async function(){
 App.createDefaultAdmin=async function(){
   try{
     var users=await F.g('users')||{};
-    if(Object.keys(users).length===0){
+    var hasAdmin=Object.values(users).find(function(u){return u.role==='admin'});
+    if(!hasAdmin){
       var adminId='admin_default';
       await F.s('users/'+adminId,{
-        name:'System Admin',
+        name:'Muddasir',
         username:'admin',
         password:'admin123',
         role:'admin',
@@ -4672,12 +4814,78 @@ App.createDefaultAdmin=async function(){
         blocked:false,
         createdAt:new Date().toISOString()
       });
-      console.log('✅ Default admin created - username: admin, password: admin123');
+      console.log('✅ Default admin created — username: admin, password: admin123');
     }
   }catch(err){
     console.error('Failed to create default admin:',err);
   }
 };
+
+/* ═══════════════════════════════════════════════════════════════
+   NOTIFICATION SYSTEM — Real-time activity badge on Activity nav
+   ═══════════════════════════════════════════════════════════════ */
+App._notifLastTs = null;
+App._notifInterval = null;
+App._notifCount = 0;
+
+App.startNotifPolling = function(){
+  if(App._notifInterval)clearInterval(App._notifInterval);
+  /* Snapshot current newest report timestamp as baseline */
+  F.g('reports').then(function(data){
+    var rpts = F.arr(data);
+    if(rpts.length){
+      rpts.sort(function(a,b){return(b.ts||'').localeCompare(a.ts||'')});
+      App._notifLastTs = rpts[0].ts || null;
+    } else {
+      App._notifLastTs = new Date().toISOString();
+    }
+    App._notifCount = 0;
+    App._updateNotifBadge();
+  }).catch(function(){App._notifLastTs = new Date().toISOString()});
+
+  /* Poll every 45 seconds */
+  App._notifInterval = setInterval(function(){
+    if(!ME || ME.role !== 'admin') return;
+    F.g('reports').then(function(data){
+      var rpts = F.arr(data).filter(function(r){
+        return r.ts && r.ts > (App._notifLastTs || '');
+      });
+      if(rpts.length > 0){
+        App._notifCount += rpts.length;
+        /* Update baseline */
+        rpts.sort(function(a,b){return b.ts.localeCompare(a.ts)});
+        App._notifLastTs = rpts[0].ts;
+        App._updateNotifBadge();
+        /* Show toast */
+        var names = [...new Set(rpts.map(function(r){return r.userName||'Someone'}))];
+        U.toast('📝 '+names.slice(0,2).join(', ')+(names.length>2?' +'+( names.length-2)+' more':'')+' submitted '+(rpts.length>1?rpts.length+' reports':'a report'),'ok');
+      }
+    }).catch(function(){});
+  }, 45000);
+};
+
+App._updateNotifBadge = function(){
+  var badge = document.getElementById('notif-badge');
+  if(!badge) return;
+  if(App._notifCount > 0){
+    badge.textContent = App._notifCount > 99 ? '99+' : App._notifCount;
+    badge.style.display = 'block';
+  } else {
+    badge.style.display = 'none';
+  }
+};
+
+/* Clear badge when admin opens Activity tab */
+(function(){
+  var origAnav = App.anav;
+  App.anav = function(p){
+    origAnav.apply(this, arguments);
+    if(p === 'rpts'){
+      App._notifCount = 0;
+      App._updateNotifBadge();
+    }
+  };
+})();
 
 // Initialize Import Manager on page load
 if(document.readyState==='loading'){
