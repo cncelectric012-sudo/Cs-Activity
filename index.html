@@ -732,6 +732,7 @@ input,select,textarea,button{font-family:var(--font)}
 <button class="adm-chip" onclick="App.attSub('deductions',this)">💸 Deductions</button>
 <button class="adm-chip" onclick="App.attSub('leaves',this)">📋 Leaves</button>
 <button class="adm-chip" onclick="App.attSub('config',this)">⚙️ Config</button>
+<button class="adm-chip" onclick="App.attSub('teamtimings',this)">⏰ Team Timings</button>
 <button class="adm-chip" onclick="App.attSub('offdays',this)">🚫 Off Days</button>
 <button class="adm-chip" onclick="App.attSub('holidays',this)">📅 Holidays</button>
 <button class="adm-chip" onclick="App.attSub('salary',this)">💰 Salary</button>
@@ -797,6 +798,24 @@ input,select,textarea,button{font-family:var(--font)}
 <div class="adm-frow"><div class="adm-fg"><span class="adm-fl">Monthly Leave Allowance (days)</span><input type="number" class="adm-fi" id="pay-leaves" value="2" min="0" max="30"></div></div>
 <button class="btn btn-R btn-sm" onclick="App.savePayrollCfg()">💾 Save Config</button>
 <div style="font-size:9px;color:var(--G5);margin-top:4px" id="pay-cfg-status">—</div>
+</div>
+
+<!-- ═══ TEAM TIMINGS SUB-TAB ═══ -->
+<div id="att-sub-teamtimings" class="att-sub" style="display:none">
+<h4>⏰ Team/Department Timings</h4>
+<div style="font-size:10px;color:var(--G5);margin-bottom:10px;line-height:1.5">Configure different start times and grace periods for different teams. Default timing applies to employees without a specific team.</div>
+<div style="background:var(--W);border:2px solid var(--G8);border-radius:var(--rl);padding:12px;margin-bottom:10px">
+<div style="font-size:11px;font-weight:700;color:var(--G3);margin-bottom:6px">➕ Add New Team Timing</div>
+<div class="adm-frow">
+<div class="adm-fg"><span class="adm-fl">Team/Department</span><input class="adm-fi" id="tt-team" placeholder="e.g., Sales, Engineering"></div>
+</div>
+<div class="adm-frow">
+<div class="adm-fg"><span class="adm-fl">Start Time</span><input type="time" class="adm-fi" id="tt-start" value="10:00"></div>
+<div class="adm-fg"><span class="adm-fl">Grace Period (min)</span><input type="number" class="adm-fi" id="tt-grace" value="10" min="0" max="60"></div>
+</div>
+<button class="btn btn-R btn-sm" onclick="App.addTeamTiming()">➕ Add Team Timing</button>
+</div>
+<div id="tt-list"></div>
 </div>
 
 <!-- ═══ OFF DAYS SUB-TAB ═══ -->
@@ -982,7 +1001,7 @@ input,select,textarea,button{font-family:var(--font)}
 'use strict';
 const C={DB:'https://cs-activity-e32b0-default-rtdb.asia-southeast1.firebasedatabase.app/',ADMIN_U:'admin',ADMIN_N:'Muddasir',ADMIN_P:'admin123',MAX_PH:5,PH_KB:200,KM_RATE:6.5,DED_LATE:200,DED_ABSENT:500,
 OFFICES:[{name:'Lahore HO (PECO Road)',lat:31.462915,lng:74.320000},{name:'Brandreth Road, Lahore',lat:31.575249,lng:74.323730},{name:'Karachi Office',lat:24.857580,lng:67.043633}],
-GEO_RADIUS:50,START_TIME:'10:00',GRACE_END:'10:15',ABSENT_TIME:'17:00',HALF_DAY:'13:00',END_TIME:'18:00',CHECKIN_START:'07:00',CHECKIN_END:'12:00',MAX_WORDS:2000,
+GEO_RADIUS:50,START_TIME:'10:00',GRACE_END:'10:10',ABSENT_TIME:'17:00',HALF_DAY:'13:00',END_TIME:'18:00',CHECKIN_START:'07:00',CHECKIN_END:'12:00',MAX_WORDS:2000,
 CLIENTS:['Ahmed Electronics','Shezan Factory','KJL','Packages Mall','Metro Cash & Carry','Nishat Mills','Sapphire Textile','Orient Electronics','Dawlance','PEL','Haier Pakistan','Siemens Pakistan','ABB Pakistan','Schneider Electric'],
 CITIES:['Lahore','Karachi','Islamabad','Rawalpindi','Faisalabad','Multan','Gujranwala','Sialkot','Peshawar','Quetta','Hyderabad','Bahawalpur','Sargodha','Sheikhupura','Kasur','Other'],
 TAGS:['recovery','followup','newclient','payment','demo','complaint','order','quote','meeting','proposal','delivery','return','cold','urgent','visitplan','cncsale','ficosale','cncpanelbuildersale'],
@@ -1019,13 +1038,31 @@ var APP_VERSION={ver:'V41',date:'27-Mar-2026',time:'12:00 PKT',build:'CS_Portal_
 /* ═══ ATTENDANCE CLASSIFICATION HELPER ═══ 
    Returns: {status, deduction, label, icon, color}
    status: 'ontime' | 'grace' | 'late' | 'notarrived' | 'absent'
-   - ontime: <= 10:00, no deduction
-   - grace: 10:01-10:15, late but NO deduction
-   - late: > 10:15, Rs 200 deduction
+   - ontime: <= start time, no deduction
+   - grace: within grace period, NO deduction (default 10 min)
+   - late: > grace period, Rs 200 deduction
    - notarrived: no record, before 17:00
    - absent: no record, after 17:00, Rs 500 deduction
+   
+   teamTiming: {startTime: 'HH:MM', graceMinutes: number} or null for default
 */
-function attClass(time, isHistorical) {
+function attClass(time, isHistorical, teamTiming) {
+  // Use team-specific timing or default
+  var startTime = teamTiming && teamTiming.startTime ? teamTiming.startTime : C.START_TIME;
+  var graceMinutes = teamTiming && teamTiming.graceMinutes ? teamTiming.graceMinutes : 10;
+  
+  // Calculate grace end time
+  var startParts = startTime.split(':');
+  var startHour = parseInt(startParts[0]);
+  var startMin = parseInt(startParts[1]);
+  var graceEndMin = startMin + graceMinutes;
+  var graceEndHour = startHour;
+  if (graceEndMin >= 60) {
+    graceEndHour++;
+    graceEndMin -= 60;
+  }
+  var graceEnd = String(graceEndHour).padStart(2,'0') + ':' + String(graceEndMin).padStart(2,'0');
+  
   if (!time) {
     // No attendance record
     if (isHistorical) return {status:'absent',deduction:C.DED_ABSENT,label:'Absent',icon:'❌',color:'var(--R)'};
@@ -1034,17 +1071,17 @@ function attClass(time, isHistorical) {
     var mm=String(d.toLocaleString('en',{timeZone:'Asia/Karachi',minute:'2-digit'})).padStart(2,'0');
     var now=hh+':'+mm;
     if (now >= C.ABSENT_TIME) return {status:'absent',deduction:C.DED_ABSENT,label:'Absent',icon:'❌',color:'var(--R)'};
-    if (now >= C.GRACE_END) return {status:'notarrived',deduction:0,label:'Not Arrived',icon:'🔴',color:'var(--R)'};
+    if (now >= graceEnd) return {status:'notarrived',deduction:0,label:'Not Arrived',icon:'🔴',color:'var(--R)'};
     return {status:'notarrived',deduction:0,label:'Not Yet',icon:'⏳',color:'var(--G5)'};
   }
-  if (time <= C.START_TIME) return {status:'ontime',deduction:0,label:'On Time ('+time+')',icon:'✅',color:'var(--grn)'};
-  if (time <= C.GRACE_END) return {status:'grace',deduction:0,label:'Grace ('+time+')',icon:'⏰',color:'var(--amb)'};
+  if (time <= startTime) return {status:'ontime',deduction:0,label:'On Time ('+time+')',icon:'✅',color:'var(--grn)'};
+  if (time <= graceEnd) return {status:'grace',deduction:0,label:'Grace ('+time+')',icon:'⏰',color:'var(--amb)'};
   return {status:'late',deduction:C.DED_LATE,label:'Late ('+time+')',icon:'⏰',color:'var(--R)'};
 }
 /* For historical/calendar: no real-time check, just ontime/grace/late/absent */
-function attClassHist(time) { return attClass(time, true); }
-/* For deduction counting: only 'late' (>10:15) gets DED_LATE, 'grace' gets 0 */
-function attDed(time) { return attClass(time, true).deduction; }
+function attClassHist(time, teamTiming) { return attClass(time, true, teamTiming); }
+/* For deduction counting: only 'late' gets DED_LATE, 'grace' gets 0 */
+function attDed(time, teamTiming) { return attClass(time, true, teamTiming).deduction; }
 
 var App={
 ltab:function(t){S.p('nav');document.getElementById('lt-si').classList.toggle('on',t==='si');document.getElementById('lt-rg').classList.toggle('on',t==='rg');document.getElementById('lf-si').style.display=t==='si'?'':'none';document.getElementById('lf-rg').style.display=t==='rg'?'':'none'},
@@ -1783,7 +1820,10 @@ return'<div class="ac"><div class="ac-top"><div><span class="ac-label">📝 '+(r
 openMap:function(lat,lng,nm,addr){S.p('nav');document.getElementById('map-nm').textContent=(nm||'')+' '+(addr||'');document.getElementById('map-gl').href='https://www.google.com/maps?q='+lat+','+lng;document.getElementById('map-ov').classList.add('on');
 setTimeout(function(){if(MAP){MAP.remove();MAP=null}MAP=L.map('leaflet-map').setView([lat,lng],15);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'OSM'}).addTo(MAP);L.marker([lat,lng]).addTo(MAP)},80)},
 closeMap:function(){document.getElementById('map-ov').classList.remove('on');if(MAP){MAP.remove();MAP=null}},
-loadDash:async function(){showLoad('Loading Dashboard','Fetching team data...');try{var u=F.arr(await F.g('users')).filter(function(x){return x.approved===true&&x.blocked!==true});var r=F.arr(await F.g('reports'));var a=F.arr(await F.g('attendance'));var t=U.today();
+loadDash:async function(){showLoad('Loading Dashboard','Fetching team data...');try{
+/* Load team timings first */
+if(!App._teamTimings){App._teamTimings=await F.g('adminConfig/teamTimings')||{}}
+var u=F.arr(await F.g('users')).filter(function(x){return x.approved===true&&x.blocked!==true});var r=F.arr(await F.g('reports'));var a=F.arr(await F.g('attendance'));var t=U.today();
 var allPlans=F.arr(await F.g('plans'));var missedCount=allPlans.filter(function(p){return(p.status==='missed')||(p.date<t&&(!p.status||p.status==='pending'))}).length;
 /* Welcome header */
 document.getElementById('dash-name').textContent=ME.name;
@@ -1793,7 +1833,12 @@ if(todayDateEl)todayDateEl.textContent=now.toLocaleDateString('en-GB',{weekday:'
 if(this._dashClock)clearInterval(this._dashClock);
 /* Today stats */
 var todayA=a.filter(function(x){return x.date===t});var todayR=r.filter(function(x){return x.date===t});
-var present=0,lateCnt=0,graceCnt=0;todayA.forEach(function(att){var ac=attClassHist(att.time||'');if(ac.status==='ontime'||ac.status==='grace')present++;else if(ac.status==='late')lateCnt++});
+var present=0,lateCnt=0,graceCnt=0;todayA.forEach(function(att){
+  var user=u.find(function(e){return e.id===att.userId});
+  var teamTiming=user?App.getTeamTiming(user.department):null;
+  var ac=attClassHist(att.time||'',teamTiming);
+  if(ac.status==='ontime'||ac.status==='grace')present++;else if(ac.status==='late')lateCnt++
+});
 var notIn=Math.max(0,u.length-present-lateCnt);
 var abLbl=document.getElementById('dk-absent-lbl');
 var nowAc=attClass(null);/* real-time check */
@@ -1808,10 +1853,11 @@ var attByUser={};todayA.forEach(function(att){attByUser[att.userId]=att});
 var teamHtml='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">';
 u.forEach(function(emp){
   var att=attByUser[emp.id];var statusIcon,statusTxt,statusClr,borderClr;
+  var teamTiming=App.getTeamTiming(emp.department);
   if(att){
-    var ac=attClass(att.time||'');statusIcon=ac.icon;statusTxt=ac.label;statusClr=ac.color;borderClr=ac.color;
+    var ac=attClass(att.time||'',false,teamTiming);statusIcon=ac.icon;statusTxt=ac.label;statusClr=ac.color;borderClr=ac.color;
     if(att.out){statusTxt+=' → '+att.out;statusIcon='🏠'}
-  }else{var ac=attClass(null);statusIcon=ac.icon;statusTxt=ac.label;statusClr=ac.color;borderClr=ac.color}
+  }else{var ac=attClass(null,false,teamTiming);statusIcon=ac.icon;statusTxt=ac.label;statusClr=ac.color;borderClr=ac.color}
   var empRpts=todayR.filter(function(x){return x.userId===emp.id});var rBadge=empRpts.length?'<span style="font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;background:var(--Rbg);color:var(--R)">'+empRpts.length+'r</span>':'';
   var empVisits=empRpts.filter(function(x){return x.type==='visit'}).length;var vBadge=empVisits?'<span style="font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;background:var(--grn-bg);color:var(--grn)">'+empVisits+'v</span>':'';
   teamHtml+='<div style="background:var(--W);border:2px solid var(--G8);border-left:4px solid '+borderClr+';border-radius:var(--r);padding:8px 10px;display:flex;align-items:center;gap:8px;cursor:pointer" onclick="App.anav(\'cal\');setTimeout(function(){document.getElementById(\'ac-emp\').value=\''+emp.id+'\';App.loadAdmCal()},100)">';
@@ -2073,6 +2119,7 @@ App.attSub=function(sub,btn){
   if(sub==='leaves') App.loadLeaves();
   if(sub==='deductions') App.loadDeductions();
   if(sub==='config') App.loadPayrollCfg();
+  if(sub==='teamtimings') App.loadTeamTimings();
   if(sub==='offdays') App.loadOffDays();
   if(sub==='holidays') App.loadHolidays();
   if(sub==='salary') App.loadSalaryTable();
@@ -2340,6 +2387,63 @@ App.savePayrollCfg=async function(){
   await F.set('adminConfig/payroll',cfg);App._payrollCfg=cfg;
   document.getElementById('pay-cfg-status').textContent='Saved: '+cfg.updatedAt;
   U.toast('Payroll config saved ✅','ok')}catch(e){U.toast('Error','err')}
+};
+
+/* ═══ TEAM TIMINGS MANAGER ═══ */
+App._teamTimings={};
+App.loadTeamTimings=async function(){
+  try{
+    App._teamTimings=await F.g('adminConfig/teamTimings')||{};
+    var keys=Object.keys(App._teamTimings);
+    if(!keys.length){
+      document.getElementById('tt-list').innerHTML='<div style="font-size:11px;color:var(--G5);padding:8px;text-align:center">No team timings configured. Using default timing (10:00 start, 10 min grace).</div>';
+      return;
+    }
+    var html='<div style="margin-top:10px">';
+    keys.forEach(function(team){
+      var t=App._teamTimings[team];
+      var graceEnd=t.startTime.split(':');
+      var gh=parseInt(graceEnd[0]);
+      var gm=parseInt(graceEnd[1])+t.graceMinutes;
+      if(gm>=60){gh++;gm-=60;}
+      var ge=String(gh).padStart(2,'0')+':'+String(gm).padStart(2,'0');
+      html+='<div style="background:var(--W);border:2px solid var(--G8);border-radius:var(--r);padding:10px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center">';
+      html+='<div><div style="font-size:13px;font-weight:700;color:var(--G1)">'+team+'</div>';
+      html+='<div style="font-size:10px;color:var(--G5);margin-top:2px">Start: '+t.startTime+' · Grace: '+t.graceMinutes+' min (until '+ge+') · No deduction for arrivals by '+ge+'</div></div>';
+      html+='<button class="btn-sm btn-ghost" onclick="App.deleteTeamTiming(\''+team+'\')">🗑</button>';
+      html+='</div>';
+    });
+    html+='</div>';
+    document.getElementById('tt-list').innerHTML=html;
+  }catch(e){console.error(e)}
+};
+App.addTeamTiming=async function(){
+  var team=document.getElementById('tt-team').value.trim();
+  var startTime=document.getElementById('tt-start').value;
+  var graceMinutes=parseInt(document.getElementById('tt-grace').value)||10;
+  if(!team||!startTime){U.toast('Fill all fields','warn');return}
+  try{
+    App._teamTimings[team]={startTime:startTime,graceMinutes:graceMinutes};
+    await F.set('adminConfig/teamTimings',App._teamTimings);
+    document.getElementById('tt-team').value='';
+    document.getElementById('tt-start').value='10:00';
+    document.getElementById('tt-grace').value='10';
+    U.toast('Team timing added ✅','ok');
+    App.loadTeamTimings();
+  }catch(e){U.toast('Error','err')}
+};
+App.deleteTeamTiming=async function(team){
+  if(!confirm('Delete timing for '+team+'?'))return;
+  try{
+    delete App._teamTimings[team];
+    await F.set('adminConfig/teamTimings',App._teamTimings);
+    U.toast('Deleted','ok');
+    App.loadTeamTimings();
+  }catch(e){U.toast('Error','err')}
+};
+App.getTeamTiming=function(department){
+  if(!department)return null;
+  return App._teamTimings[department]||null;
 };
 
 /* ═══ OFF DAYS MANAGER ═══ */
@@ -3635,7 +3739,17 @@ App.loadAdmCal=async function(){
   if(!uid){document.getElementById('ac-no').style.display='block';document.getElementById('ac-wrap').style.display='none';return}
   document.getElementById('ac-no').style.display='none';document.getElementById('ac-wrap').style.display='block';
   showLoad('Loading Calendar','Fetching employee data...');
-  try{_acRpts=F.arr(await F.g('reports'));_acAtt=F.arr(await F.g('attendance'));_acPlans=F.arr(await F.g('plans')).filter(function(p){return p.userId===uid});App._allLeaves=await F.g('leaves')}catch(e){}
+  try{
+    /* Load team timings */
+    if(!App._teamTimings){App._teamTimings=await F.g('adminConfig/teamTimings')||{}}
+    /* Load user data to get department */
+    var allUsers=F.arr(await F.g('users'));
+    App._acUser=allUsers.find(function(u){return u.id===uid})||{};
+    _acRpts=F.arr(await F.g('reports'));
+    _acAtt=F.arr(await F.g('attendance'));
+    _acPlans=F.arr(await F.g('plans')).filter(function(p){return p.userId===uid});
+    App._allLeaves=await F.g('leaves')
+  }catch(e){}
   var n=new Date();_acY=n.getFullYear();_acM=n.getMonth();_acFil='all';_acDlOpen=false;
   document.getElementById('ac-dl-panel').style.display='none';document.getElementById('ac-dl-toggle').textContent='▶ Day Log';
   App.renderAdmCal();hideLoad()};
@@ -3644,6 +3758,7 @@ App.admCalNav=function(dir){if(dir===0){var n=new Date();_acY=n.getFullYear();_a
 
 App.renderAdmCal=function(){
   var uid=document.getElementById('ac-emp').value;if(!uid)return;
+  var teamTiming=App._acUser?App.getTeamTiming(App._acUser.department):null;
   var moStr=_acY+'-'+String(_acM+1).padStart(2,'0');
   var moNames=['January','February','March','April','May','June','July','August','September','October','November','December'];
   document.getElementById('ac-mo').textContent=moNames[_acM]+' '+_acY;
@@ -3668,7 +3783,7 @@ App.renderAdmCal=function(){
       var isLeave=App.isApprovedLeave(uid,ds,App._allLeaves);
       if(isLeave>=1){tags+='<span class="d-tag d-tag-lv">LV</span>'}
       else if(isLeave===0.5){tags+='<span class="d-tag" style="background:#fef3c7;color:#d97706;font-size:7px;padding:1px 3px;border-radius:3px">½LV</span>'}
-      else if(att){var ac=attClassHist(att.time||'');if(ac.status==='late'){tags+='<span class="d-tag d-tag-late">⏰</span>';late++}else{tags+='<span class="d-tag d-tag-att">✓</span>';onTime++}}
+      else if(att){var ac=attClassHist(att.time||'',teamTiming);if(ac.status==='late'){tags+='<span class="d-tag d-tag-late">⏰</span>';late++}else{tags+='<span class="d-tag d-tag-att">✓</span>';onTime++}}
       else if(ds<today){tags+='<span class="d-tag d-tag-abs">ABS</span>';absent++}
       var visits=dayR.filter(function(r){return r.type==='visit'});
       if(visits.length)tags+='<span class="d-tag d-tag-v">'+visits.length+'V</span>';
@@ -3708,7 +3823,7 @@ App.admCalTap=function(ds){
     } else if(isLeaveDay===0.5){
       h+='<div class="cp-row"><span class="cp-label">Status</span><span class="cp-val" style="color:#d97706">📋 ½ Day Leave</span></div>';
     }
-    var ac2=att?attClassHist(att.time||''):null;var attStatus=att?(ac2.icon+' '+ac2.label):(isLeaveDay?'📋 On Leave':'❌ Absent');
+    var ac2=att?attClassHist(att.time||'',App._acUser?App.getTeamTiming(App._acUser.department):null):null;var attStatus=att?(ac2.icon+' '+ac2.label):(isLeaveDay?'📋 On Leave':'❌ Absent');
     var attClr=att?ac2.color:(isLeaveDay?'var(--blu)':'var(--R)');
     h+='<div class="cp-row"><span class="cp-label">Attendance</span><span class="cp-val" style="color:'+attClr+'">'+attStatus+'</span></div>';
     if(att&&att.out){var hrs=U.workHrs(att.time,att.out);h+='<div class="cp-row"><span class="cp-label">Departure</span><span class="cp-val">'+att.out+' ('+hrs.toFixed(1)+'h)</span></div>'}
@@ -4884,7 +4999,7 @@ App.createDefaultAdmin=async function(){
     var hasAdmin=Object.values(users).find(function(u){return u.role==='admin'});
     if(!hasAdmin){
       var adminId='admin_default';
-      await F.s('users/'+adminId,{
+      await F.set('users/'+adminId,{
         name:'Muddasir',
         username:'admin',
         password:'admin123',
@@ -4896,7 +5011,8 @@ App.createDefaultAdmin=async function(){
       console.log('✅ Default admin created — username: admin, password: admin123');
     }
   }catch(err){
-    console.error('Failed to create default admin:',err);
+    // Silently fail - admin can still login with hardcoded credentials
+    console.log('ℹ️ Could not check/create default admin (network issue). You can still login with: admin / admin123');
   }
 };
 
